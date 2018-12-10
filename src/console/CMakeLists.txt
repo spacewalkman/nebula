@@ -42,6 +42,7 @@ target_link_libraries(
     ncurses
     dl
     -pthread
+    unwind
 )
 
 install(TARGETS nebula DESTINATION bin)

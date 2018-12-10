@@ -8,6 +8,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME proc_accessor_test COMMAND proc_accessor_test)
 

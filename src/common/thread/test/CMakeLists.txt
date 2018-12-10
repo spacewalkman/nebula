@@ -19,5 +19,6 @@ target_link_libraries(
     double-conversion
     pthread
     dl
+    unwind
 )
 add_test(NAME thread_test COMMAND thread_test)

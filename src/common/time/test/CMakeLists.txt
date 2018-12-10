@@ -15,6 +15,7 @@ target_link_libraries(
     event
     dl
     -pthread
+    unwind
 )
 
 add_test(NAME duration_test COMMAND duration_test)
@@ -37,4 +38,5 @@ target_link_libraries(
     event
     dl
     -pthread
+    unwind
 )

@@ -28,7 +28,7 @@ echo
 cd $SOURCE_DIR
 
 COMPILER_FLAGS="-fPIC -DPIC    $EXTRA_CXXFLAGS"
-LINKER_FLAGS="-static-libgcc -static-libstdc++    $EXTRA_LDFLAGS"
+LINKER_FLAGS="-static-libgcc -static-libstdc++ -lboost_system $EXTRA_LDFLAGS"
 NEBULA_PREFIX_DIRS="$double_conversion_release;$gflags_release;$glog_release;$folly_release;$wangle_release;$mstch_release;$zlib_release;$zstd_release;$NEBULA_PREFIX_DIRS"
 NEBULA_INCLUDE_DIRS="$double_conversion_release/include;$gflags_release/include;$glog_release/include;$folly_release/include;$wangle_release/include;$mstch_release/include;$zlib_release/include;$zstd_release/include;$NEBULA_INCLUDE_DIRS"
 NEBULA_LIB_DIRS="$double_conversion_release/lib;$gflags_release/lib;$glog_release/lib;$folly_release/lib;$wangle_release/lib;$mstch_release/lib;$zlib_release/lib;$zstd_release/lib;$NEBULA_LIB_DIRS"

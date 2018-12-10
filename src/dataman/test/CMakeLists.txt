@@ -21,6 +21,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME row_reader_test COMMAND row_reader_test)
 
@@ -48,6 +49,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME row_writer_test COMMAND row_writer_test)
 
@@ -75,6 +77,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME row_updater_test COMMAND row_updater_test)
 
@@ -102,6 +105,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME rowset_reader_writer_test COMMAND rowset_reader_writer_test)
 
@@ -130,6 +134,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 
 
@@ -157,5 +162,6 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 

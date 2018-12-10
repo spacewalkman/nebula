@@ -8,6 +8,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME cord_test COMMAND cord_test)
 
@@ -23,6 +24,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 
 add_executable(murmurhash2_test MurmurHash2Test.cpp $<TARGET_OBJECTS:base_obj>)
@@ -36,6 +38,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME murmurhash2_test COMMAND murmurhash2_test)
 
@@ -55,6 +58,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+   unwind
 )
 add_test(NAME configuration_test COMMAND configuration_test)
 
@@ -107,4 +111,5 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )

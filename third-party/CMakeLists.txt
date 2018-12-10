@@ -1,3 +1,4 @@
+    cmake_minimum_required(VERSION 3.13)
 set(ADDITIONAL_MAKE_CLEAN_FILES "_build/")
 
 SET(build_command
@@ -30,6 +31,12 @@ macro(build_external tgtName)
         DEPENDS ${ARGN}
     )
 endmacro(build_external)
+find_package(Boost REQUIRED)
+
+if(Boost_FOUND)
+    message("Boost_INCLUDE_DIRS===" ${Boost_INCLUDE_DIRS})
+    message("Boost_LIBRARY_DIRS===" ${Boost_LIBRARY_DIRS})
+endif()
 
 add_subdirectory(bzip2)
 add_subdirectory(double-conversion)

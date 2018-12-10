@@ -13,6 +13,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME file_utils_test COMMAND file_utils_test)
 
@@ -31,6 +32,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME temp_dir_test COMMAND temp_dir_test)
 
@@ -50,6 +52,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME temp_file_test COMMAND temp_file_test)
 

@@ -23,6 +23,7 @@ target_link_libraries(
     event
     z
     -pthread
+    unwind
 )
 add_test(NAME part_test COMMAND part_test)
 

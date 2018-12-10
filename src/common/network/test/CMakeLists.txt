@@ -18,6 +18,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 add_test(NAME network_utils_test COMMAND network_utils_test)
 
@@ -42,4 +43,5 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )

@@ -24,9 +24,9 @@ echo
 cd $SOURCE_DIR
 
 compiler_flags="-fPIC -DPIC -DOPTDBG=1 -DROCKSDB_PLATFORM_POSIX -DROCKSDB_SUPPORT_THREAD_LOCAL -DOS_LINUX -fno-builtin-memcmp -DROCKSDB_MALLOC_USABLE_SIZE -march=native -Wno-error=shadow  $EXTRA_CXXFLAGS"
-exe_linker_flags="-ldl $EXTRA_LDFLAGS"
-NEBULA_INCLUDE_DIRS="$zlib_release/include;$zstd_release/include;$snappy_release/include;$jemalloc_release/include;$NEBULA_INCLUDE_DIRS"
-NEBULA_LIB_DIRS="$zlib_release/lib;$zstd_release/lib;$snappy_release/lib;$jemalloc_release/lib;$NEBULA_LIB_DIRS"
+exe_linker_flags="-ldl -lunwind $EXTRA_LDFLAGS"
+VGRAPH_INCLUDE_DIRS="$zlib_release/include;$zstd_release/include;$snappy_release/include;$jemalloc_release/include;$VGRAPH_INCLUDE_DIRS"
+VGRAPH_LIB_DIRS="$zlib_release/lib;$zstd_release/lib;$snappy_release/lib;$jemalloc_release/lib;$NEBULA_LIB_DIRS"
 
 if [[ $SOURCE_DIR/CMakeLists.txt -nt $SOURCE_DIR/Makefile ||
       $CURR_DIR/build.sh -nt $SOURCE_DIR/Makefile ]]; then

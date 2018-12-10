@@ -30,6 +30,7 @@ target_link_libraries(
     dl
     event
     -pthread
+    unwind
 )
 add_test(NAME file_based_wal_test COMMAND file_based_wal_test)
 

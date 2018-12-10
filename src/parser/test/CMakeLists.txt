@@ -21,6 +21,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 target_include_directories(parser_test SYSTEM BEFORE PUBLIC ${FLEX_INCLUDE_DIRS})
 add_test(NAME parser_test COMMAND parser_test)
@@ -50,6 +51,7 @@ target_link_libraries(
     double-conversion
     dl
     -pthread
+    unwind
 )
 target_include_directories(scanner_test SYSTEM BEFORE PUBLIC ${FLEX_INCLUDE_DIRS})
 add_test(NAME scanner_test COMMAND scanner_test)
