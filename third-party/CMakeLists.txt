@@ -1,4 +1,3 @@
-    cmake_minimum_required(VERSION 3.13)
 set(ADDITIONAL_MAKE_CLEAN_FILES "_build/")
 
 SET(build_command
