@@ -15,6 +15,7 @@ add_dependencies(meta_obj base_obj dataman_obj)
 add_library(
     meta_service_handler OBJECT
     MetaServiceHandler.cpp
+    MetaUtils.cpp
 )
 add_dependencies(
     meta_service_handler
@@ -22,5 +23,12 @@ add_dependencies(
     meta_thrift_obj
     kvstore_obj
 )
+
+add_library(
+    meta_client OBJECT
+    client/MetaClient.cpp
+)
+
+add_dependencies(meta_client base_obj meta_thrift_obj)
 
 add_subdirectory(test)
