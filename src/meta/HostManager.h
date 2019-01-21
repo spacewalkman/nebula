@@ -13,6 +13,7 @@
 namespace nebula {
 namespace meta {
 
+//将partition映射到host??
 class HostManager final {
 public:
     static std::shared_ptr<const HostManager> get(GraphSpaceID space);

@@ -40,13 +40,14 @@ protected:
     StorageEngine* engine_ = nullptr;
 };
 
+//可能还有别的RaftPart，ConsensusPart
 /**
  * Bypass raft, just write into storage when asyncMultiPut invoked.
  * */
 class SimplePart final : public Part {
 public:
     SimplePart(GraphSpaceID spaceId, PartitionID partId,
-               const std::string& walPath, StorageEngine* engine) 
+               const std::string& walPath, StorageEngine* engine)
         : Part(spaceId, partId, walPath, engine) {}
 
     ResultCode asyncMultiPut(std::vector<KV> keyValues, KVCallback cb) override;

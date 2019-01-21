@@ -13,6 +13,7 @@
 namespace nebula {
 namespace graph {
 
+//query thrift的server端实现代码
 GraphService::GraphService() {
     sessionManager_ = std::make_unique<SessionManager>();
     executionEngine_ = std::make_unique<ExecutionEngine>();

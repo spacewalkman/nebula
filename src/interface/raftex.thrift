@@ -121,7 +121,7 @@ struct AppendLogResponse {
     8: bool         pulling_snapshot;
 }
 
-
+//面向RaftPart的
 service RaftexService {
     AskForVoteResponse askForVote(1: AskForVoteRequest req);
     AppendLogResponse appendLog(1: AppendLogRequest req);

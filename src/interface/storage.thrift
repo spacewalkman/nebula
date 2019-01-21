@@ -202,6 +202,7 @@ struct AddEdgesRequest {
     3: bool overwritable,
 }
 
+//面向QuertEngine的
 service StorageService {
     QueryResponse getOutBound(1: GetNeighborsRequest req)
     QueryResponse getInBound(1: GetNeighborsRequest req)

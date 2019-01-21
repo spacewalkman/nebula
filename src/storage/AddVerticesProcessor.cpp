@@ -13,11 +13,13 @@
 namespace nebula {
 namespace storage {
 
+//将StorageEngine发过来的内容转换成KV
 void AddVerticesProcessor::process(const cpp2::AddVerticesRequest& req) {
     auto now = startMs_ = time::TimeUtils::nowInMSeconds();
     const auto& partVertices = req.get_vertices();
     auto spaceId = req.get_space_id();
     callingNum_ = partVertices.size();
+    //点和边的属性按照shard分开，然后调用rocksdb的put api
     std::for_each(partVertices.begin(), partVertices.end(), [&](auto& pv) {
         auto partId = pv.first;
         const auto& vertices = pv.second;

@@ -14,6 +14,7 @@
 namespace nebula {
 namespace kvstore {
 
+//屏蔽底层storage实现，是否使用raft，或者使用单副本
 class StorageEngine {
 public:
     StorageEngine(GraphSpaceID spaceId)

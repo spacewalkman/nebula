@@ -12,6 +12,7 @@
 namespace nebula {
 namespace meta {
 
+//part(shard)映射到
 class PartManager final {
 public:
     // Retrieve the Partition Manager for the given graph space

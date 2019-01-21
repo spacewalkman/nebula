@@ -13,9 +13,11 @@ namespace kvstore {
 //static
 PartManager* PartManager::instance_;
 static std::once_flag initPartManFlag;
+
+//factory method
 PartManager* PartManager::instance() {
     std::call_once(initPartManFlag, [](){
-        if (FLAGS_part_man_type == "memory") {
+        if (FLAGS_part_man_type == "memory") { //根据传入的参数不同，将创建不同的XXXPartManager实例
             instance_ = new MemPartManager();
         } else {
             LOG(FATAL) << "Unknown partManager type " << FLAGS_part_man_type;

@@ -21,10 +21,12 @@ struct PartMeta {
     std::vector<MachineID> peers_;
 };
 
+//graphSpace和与其对应的所有partition(以及partition相关的meta)之间的mapping
 using PartsMap  = std::unordered_map<GraphSpaceID, std::unordered_map<PartitionID, PartMeta>>;
 /**
  * This class manages all meta information one storage host needed.
  * */
+ //partition manager
 class PartManager {
 public:
     /**
@@ -37,11 +39,13 @@ public:
     /**
      * return PartsMap for machineId
      * */
+     //返回一个机器的所有的partition信息
     virtual PartsMap parts(HostAddr hostAddr) = 0;
 
     /**
      * return PartMeta for <spaceId, partId>
      * */
+     //给定一个graphdb,partitionId返回这个指定的
     virtual PartMeta partMeta(GraphSpaceID spaceId, PartitionID partId) = 0;
 
 protected:

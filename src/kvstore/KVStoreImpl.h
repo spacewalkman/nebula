@@ -25,6 +25,7 @@ struct GraphSpaceKV {
     std::vector<Engine> engines_;
 };
 
+//管控的类
 class KVStoreImpl : public KVStore {
     FRIEND_TEST(KVStoreTest, SimpleTest);
 public:
