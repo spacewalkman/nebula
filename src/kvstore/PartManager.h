@@ -18,7 +18,7 @@ using MachineID = uint32_t;
 struct PartMeta {
     GraphSpaceID           spaceId_;
     PartitionID            partId_;
-    std::vector<MachineID> peers_;
+    std::vector<HostAddr> peers_;
 };
 
 using PartsMap  = std::unordered_map<GraphSpaceID, std::unordered_map<PartitionID, PartMeta>>;
@@ -70,8 +70,11 @@ public:
 
     PartMeta partMeta(GraphSpaceID spaceId, PartitionID partId) override;
 
-    void addPart(GraphSpaceID spaceId, PartitionID partId) {
-        partsMap_[spaceId][partId] = PartMeta();
+    void addPart(GraphSpaceID spaceId, PartitionID partId, std::vector<HostAddr> peers = {}) {
+        auto& pm = partsMap_[spaceId][partId];
+        pm.spaceId_ = spaceId;
+        pm.partId_  = partId;
+        pm.peers_ = std::move(peers);
     }
 
     bool partExist(GraphSpaceID spaceId, PartitionID partId) override {
