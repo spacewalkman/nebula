@@ -16,7 +16,13 @@ add_library(
     meta_service_handler OBJECT
     MetaServiceHandler.cpp
     MetaUtils.cpp
+    processors/CreateSpaceProcessor.cpp
+    processors/AddHostsProcessor.cpp
+    processors/ListHostsProcessor.cpp
+    processors/ListSpacesProcessor.cpp
+    processors/GetPartsAllocProcessor.cpp
 )
+
 add_dependencies(
     meta_service_handler
     base_obj
