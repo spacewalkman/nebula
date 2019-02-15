@@ -147,7 +147,7 @@ TEST(FileUtils, listAllTypedEntitiesInDir) {
     char dirTemp[] = "/tmp/FileUtilTest-TempDir.XXXXXX";
     ASSERT_NE(mkdtemp(dirTemp), nullptr);
 
-    fstream file;
+    std::fstream file;
     // Create 3 wal files, the LARGEST wal file should be returned as vector's
     // last elements
     char fileTemp[64];
