@@ -143,6 +143,34 @@ TEST(FileUtils, removeDirNonrecursively) {
 }
 
 
+TEST(FileUtils, listAllTypedEntitiesInDir) {
+    char dirTemp[] = "/tmp/FileUtilTest-TempDir.XXXXXX";
+    ASSERT_NE(mkdtemp(dirTemp), nullptr);
+
+    fstream file;
+    // Create 3 wal files, the LARGEST wal file should be returned as vector's
+    // last elements
+    char fileTemp[64];
+    snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000000000.wal", dirTemp);
+    file.open(fileTemp, ios::out);
+    file.close();
+    ASSERT_FALSE(file.is_open());
+
+    snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000100000.wal", dirTemp);
+    file.open(fileTemp, ios::out);
+    file.close();
+    ASSERT_FALSE(file.is_open());
+
+    snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000200000.wal", dirTemp);
+    file.open(fileTemp, ios::out);
+    file.close();
+    ASSERT_FALSE(file.is_open());
+
+    auto allFiles = FileUtils::listAllFilesInDir(dirTemp, false, "*.wal");
+    ASSERT_EQ(*allFiles.rbegin(), "00000000000000200000.wal");
+}
+
+
 TEST(FileUtils, removeDirRecursively) {
     // Create a temp directory
     char dirTemp[] = "/tmp/FileUtilTest-TempDir.XXXXXX";
