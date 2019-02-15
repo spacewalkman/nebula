@@ -152,17 +152,17 @@ TEST(FileUtils, listAllTypedEntitiesInDir) {
     // last elements
     char fileTemp[64];
     snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000000000.wal", dirTemp);
-    file.open(fileTemp, ios::out);
+    file.open(fileTemp, std::ios::out);
     file.close();
     ASSERT_FALSE(file.is_open());
 
     snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000100000.wal", dirTemp);
-    file.open(fileTemp, ios::out);
+    file.open(fileTemp, std::ios::out);
     file.close();
     ASSERT_FALSE(file.is_open());
 
     snprintf(fileTemp, sizeof(fileTemp), "%s/00000000000000200000.wal", dirTemp);
-    file.open(fileTemp, ios::out);
+    file.open(fileTemp, std::ios::out);
     file.close();
     ASSERT_FALSE(file.is_open());
 
