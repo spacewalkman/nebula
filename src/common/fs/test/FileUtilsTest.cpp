@@ -167,6 +167,7 @@ TEST(FileUtils, listAllTypedEntitiesInDir) {
     ASSERT_FALSE(file.is_open());
 
     auto allFiles = FileUtils::listAllFilesInDir(dirTemp, false, "*.wal");
+    ASSERT_EQ(allFiles.size(), 3);
     ASSERT_EQ(*allFiles.rbegin(), "00000000000000200000.wal");
 }
 
