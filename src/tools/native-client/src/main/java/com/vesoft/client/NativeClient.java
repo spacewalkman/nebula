@@ -132,8 +132,17 @@ public class NativeClient implements AutoCloseable {
     }
 
     public static void main(String[] args) throws RocksDBException {
-        Object[] values = {false, 7, 1024L, 3.14F, 0.618, "darion.yaphet"}; // boolean int long float double String
+        Object[] values = {
+                false,
+                7,
+                1024L,
+                3.14F,
+                0.618,
+                "Hello World!",
+                "Hello".getBytes(),
+                ByteBuffer.wrap("World".getBytes())
+        };
         String result = encode(values);
-        System.out.println("values : "+result +"  "+result.length());
+        System.out.println("values : " + result + "  " + result.length());
     }
 }

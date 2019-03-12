@@ -55,8 +55,26 @@ JNIEXPORT jstring JNICALL Java_com_vesoft_client_NativeClient_encode(JNIEnv *env
             jstring j_value = static_cast<jstring>(env->CallObjectMethod(obj, m));
             auto value = std::string(env->GetStringUTFChars(j_value, NULL));
             v.emplace_back(std::move(value));
+        } else if (name.compare("[B") == 0) {
+            jbyteArray bytes = static_cast<jbyteArray>(obj);
+            jclass string_clazz = (env)->FindClass("Ljava/lang/String;");
+            jmethodID string_construction = (env)->GetMethodID(string_clazz, "<init>", "([B)V");
+            jstring j_value = static_cast<jstring>(env->NewObject(string_clazz,
+                                                                  string_construction, bytes));
+            auto value = std::string(env->GetStringUTFChars(j_value, NULL));
+            v.emplace_back(std::move(value));
+        } else if (name.compare("java.nio.HeapByteBuffer") == 0) {
+            jmethodID m = env->GetMethodID(clazz, "array", "()[B");
+            auto bytes = env->CallObjectMethod(obj, m);
+            jclass string_clazz = (env)->FindClass("Ljava/lang/String;");
+            jmethodID string_construction = (env)->GetMethodID(string_clazz, "<init>", "([B)V");
+            jstring j_value = static_cast<jstring>(env->NewObject(string_clazz,
+                                                                  string_construction, bytes));
+            auto value = std::string(env->GetStringUTFChars(j_value, NULL));
+            v.emplace_back(std::move(value));
         } else {
             // Type Error
+            std::cout << "Type Error : " << name << std::endl;
         }
     }
 

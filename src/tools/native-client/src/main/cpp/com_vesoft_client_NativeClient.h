@@ -37,7 +37,7 @@ extern "C" {
  * Signature: ([Ljava/lang/Object;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_vesoft_client_NativeClient_encode
-  (JNIEnv *, jobject, jobjectArray);
+  (JNIEnv *, jclass, jobjectArray);
 
 #ifdef __cplusplus
 }
