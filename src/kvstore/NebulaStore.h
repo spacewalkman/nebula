@@ -112,6 +112,11 @@ public:
                       const std::string& prefix,
                       std::unique_ptr<KVIterator>* iter) override;
 
+    void asyncPut(GraphSpaceID spaceId,
+                  PartitionID  partId,
+                  KV keyValue,
+                  KVCallback cb) override;
+
     // async batch put.
     void asyncMultiPut(GraphSpaceID spaceId,
                        PartitionID  partId,

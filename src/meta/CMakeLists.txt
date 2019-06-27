@@ -46,6 +46,11 @@ nebula_add_library(
     processors/configMan/GetConfigProcessor.cpp
     processors/configMan/ListConfigsProcessor.cpp
     processors/configMan/SetConfigProcessor.cpp
+    processors/importMan/DownloadSstFilesProcessor.cpp
+    processors/importMan/IngestSstFilesProcessor.cpp
+    processors/importMan/KillJobProcessor.cpp
+    processors/importMan/ShowDownloadJobProcessor.cpp
+    processors/importMan/ShowIngestJobProcessor.cpp
 )
 
 nebula_add_library(

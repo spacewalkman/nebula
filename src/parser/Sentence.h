@@ -54,12 +54,16 @@ public:
         kChangePassword,
         kDownload,
         kIngest,
+        kShowJobs,
+        kShowJob,
+        kAbortJob,
         kOrderBy,
         kConfig,
         kFetchVertices,
         kFetchEdges,
         kBalance,
     };
+
 
     Kind kind() const {
         return kind_;

@@ -15,7 +15,7 @@ namespace graph {
 
 class DownloadExecutor final : public Executor {
 public:
-    DownloadExecutor(Sentence *sentence, ExecutionContext *context);
+    DownloadExecutor(Sentence *sentence, ExecutionContext *ectx);
 
     const char* name() const override {
         return "DownloadExecutor";
@@ -25,15 +25,11 @@ public:
 
     void execute() override;
 
-    void setupResponse(cpp2::ExecutionResponse &resp) override;
-
 private:
-    DownloadSentence                           *sentence_{nullptr};
-    std::unique_ptr<cpp2::ExecutionResponse>    resp_;
+    DownloadExecutor                          *sentence_{nullptr};
 };
 
 }   // namespace graph
 }   // namespace nebula
 
 #endif  // GRAPH_DOWNLOADEXECUTOR_H
-

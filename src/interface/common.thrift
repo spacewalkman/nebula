@@ -26,6 +26,9 @@ typedef i64 (cpp.type = "nebula::SchemaVer") SchemaVer
 typedef i32 (cpp.type = "nebula::UserID") UserID
 typedef i64 (cpp.type = "nebula::ClusterID") ClusterID
 
+// Long-running job id
+typedef string (cpp.type = "nebula::JobID") JobID
+
 // These are all data types supported in the graph properties
 enum SupportedType {
     UNKNOWN = 0,
@@ -90,3 +93,54 @@ struct Pair {
 }
 
 const ValueType kInvalidValueType = {"type" : UNKNOWN}
+
+// The following will be shared between meta and storage thrift
+// All type of tasks
+enum ImportJobType {
+    DOWNLOAD  = 0x01,
+    INGEST    = 0x02,
+    //TODO: add other task type here, like BALANCE?
+} (cpp.enum_strict)
+
+// Download sst files request
+struct DownloadSstFilesReq {
+    // which graph space this download request for
+    1: GraphSpaceID  space_id,
+    // hdfs parent dir which hold all sst files for all partitions
+    2: string        hdfs_dir,
+    // some local dir that have sufficient disk capacity to hold sst files for all partitions it
+    // holds, need to specified, because it need to be consistent among all host
+    3: string        local_dir,
+}
+
+struct IngestSstFilesReq {
+    // which graph space this download request for
+    1: GraphSpaceID     space_id,
+    // some local dir that sst files reside
+    2: string           local_dir,
+}
+
+// What client get is async task id, import = download OR ingest
+struct ImportSstFilesResp {
+    // async download task id for query
+    1: JobID       job_id,
+}
+
+// Long-running task status like Download or Ingest sst files, could be queried by `show task`
+enum JobStatus {
+    INITIALIZING    = 0x01,
+    RUNNING         = 0x02,
+    ERROR           = 0x03,
+    SUCCESS         = 0x04,
+    KILLED          = 0x05,
+} (cpp.enum_strict)
+
+// What storage server report to meta server after making progress
+struct UpdateProgressReq {
+    1: JobID        job_id,
+    2: PartitionID  partition_id,
+    // When normal, delta will be populated
+    3: i64          delta,
+    // When error, code will be populated
+    4: JobStatus    status,
+}

@@ -1347,6 +1347,51 @@ TEST(Parser, BalanceOperation) {
     {
         GQLParser parser;
         std::string query = "BALANCE LEADER";
+      auto result = parser.parse(query);
+      ASSERT_TRUE(result.ok()) << result.status();
+    }
+}
+
+TEST(Parser, Download) {
+    {
+        GQLParser parser;
+        std::string query = "DOWNLOAD http://localhost:9001/some_dir/ INTO /some/local/dir";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+    {
+        GQLParser parser;
+        std::string query = "DOWNLOAD http://localhost:9001/some_dir/ INTO /some/local/dir FOR graph_space1";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+}
+
+TEST(Parser, Ingest) {
+    {
+        GQLParser parser;
+        std::string query = "INGEST /some/local/dir";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+    {
+        GQLParser parser;
+        std::string query = "INGEST /some/local/dir FOR graph_space1";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+}
+
+TEST(Parser, ShowTasks) {
+    {
+        GQLParser parser;
+        std::string query = "SHOW TASKS";
+        auto result = parser.parse(query);
+        ASSERT_TRUE(result.ok()) << result.status();
+    }
+    {
+        GQLParser parser;
+        std::string query = "SHOW TASK 123";
         auto result = parser.parse(query);
         ASSERT_TRUE(result.ok()) << result.status();
     }

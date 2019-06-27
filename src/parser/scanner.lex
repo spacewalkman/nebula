@@ -104,9 +104,13 @@ IN                          ([Ii][Nn])
 TTL_DURATION                ([Tt][Tt][Ll][_][Dd][Uu][Rr][Aa][Tt][Ii][Oo][Nn])
 TTL_COL                     ([Tt][Tt][Ll][_][Cc][Oo][Ll])
 DOWNLOAD                    ([Dd][Oo][Ww][Nn][Ll][Oo][Aa][Dd])
-HDFS                        ([Hh][Dd][Ff][Ss])
-ORDER                       ([Oo][Rr][Dd][Ee][Rr])
+INTO                        ([Ii][Nn][Tt][Oo])
 INGEST                      ([Ii][Nn][Gg][Ee][Ss][Tt])
+FOR                         ([Ff][Oo][Rr])
+JOBS                        ([Jj][Oo][Bb][Ss])
+JOB                         ([Jj][Oo][Bb])
+ABORT                       ([Aa][Bb][Oo][Rr][Tt])
+ORDER                       ([Oo][Rr][Dd][Ee][Rr])
 ASC                         ([Aa][Ss][Cc])
 DISTINCT                    ([Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt])
 VARIABLES                   ([Vv][Aa][Rr][Ii][Aa][Bb][Ll][Ee][Ss])
@@ -122,7 +126,8 @@ LEADER                      ([Ll][Ee][Aa][Dd][Ee][Rr])
 UUID                        ([Uu][Uu][Ii][Dd])
 OF                          ([Oo][Ff])
 DATA                        ([Dd][Aa][Tt][Aa])
-
+IMPORT                      ([Ii][Mm][Pp][Oo][Rr][Tt])
+INTO                        ([Ii][Nn][Tt][Oo])
 LABEL                       ([a-zA-Z][_a-zA-Z0-9]*)
 DEC                         ([0-9])
 HEX                         ([0-9a-fA-F])
@@ -213,13 +218,19 @@ IP_OCTET                    ([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])
 {TTL_DURATION}              { return TokenType::KW_TTL_DURATION; }
 {TTL_COL}                   { return TokenType::KW_TTL_COL; }
 {DOWNLOAD}                  { return TokenType::KW_DOWNLOAD; }
-{HDFS}                      { return TokenType::KW_HDFS; }
+{INTO}                      { return TokenType::KW_INTO; }
+{INGEST}                    { return TokenType::KW_INGEST; }
+{JOBS}                      { return TokenType::KW_JOBS; }
+{JOB}                       { return TokenType::KW_JOB; }
+{ABORT}                     { return TokenType::KW_ABORT; }
 {VARIABLES}                 { return TokenType::KW_VARIABLES; }
 {GET}                       { return TokenType::KW_GET; }
 {GRAPH}                     { return TokenType::KW_GRAPH; }
 {META}                      { return TokenType::KW_META; }
 {STORAGE}                   { return TokenType::KW_STORAGE; }
 {OF}                        { return TokenType::KW_OF; }
+{IMPORT}                    { return TokenType::KW_IMPORT; }
+{INTO}                      { return TokenType::KW_INTO; }
 {TRUE}                      { yylval->boolval = true; return TokenType::BOOL; }
 {FALSE}                     { yylval->boolval = false; return TokenType::BOOL; }
 {ORDER}                     { return TokenType::KW_ORDER; }

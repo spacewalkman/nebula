@@ -3,8 +3,8 @@
  * This source code is licensed under Apache 2.0 License,
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
-#include "base/Base.h"
 #include "parser/MutateSentences.h"
+#include "base/Base.h"
 
 namespace nebula {
 
@@ -21,7 +21,6 @@ std::string PropertyList::toString() const {
     return buf;
 }
 
-
 std::string VertexTagItem::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -35,7 +34,6 @@ std::string VertexTagItem::toString() const {
 
     return buf;
 }
-
 
 std::string VertexTagList::toString() const {
     std::string buf;
@@ -51,7 +49,6 @@ std::string VertexTagList::toString() const {
     return buf;
 }
 
-
 std::string ValueList::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -65,7 +62,6 @@ std::string ValueList::toString() const {
     return buf;
 }
 
-
 std::string VertexRowItem::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -76,7 +72,6 @@ std::string VertexRowItem::toString() const {
     buf += ")";
     return buf;
 }
-
 
 std::string VertexRowList::toString() const {
     std::string buf;
@@ -91,7 +86,6 @@ std::string VertexRowList::toString() const {
     return buf;
 }
 
-
 std::string InsertVertexSentence::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -101,7 +95,6 @@ std::string InsertVertexSentence::toString() const {
     buf += rows_->toString();
     return buf;
 }
-
 
 std::string EdgeRowItem::toString() const {
     std::string buf;
@@ -122,7 +115,6 @@ std::string EdgeRowItem::toString() const {
     return buf;
 }
 
-
 std::string EdgeRowList::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -135,7 +127,6 @@ std::string EdgeRowList::toString() const {
     }
     return buf;
 }
-
 
 std::string InsertEdgeSentence::toString() const {
     std::string buf;
@@ -152,7 +143,6 @@ std::string InsertEdgeSentence::toString() const {
     return buf;
 }
 
-
 std::string UpdateItem::toString() const {
     std::string buf;
     buf.reserve(256);
@@ -161,7 +151,6 @@ std::string UpdateItem::toString() const {
     buf += value_->toString();
     return buf;
 }
-
 
 std::string UpdateList::toString() const {
     std::string buf;
@@ -175,7 +164,6 @@ std::string UpdateList::toString() const {
     }
     return buf;
 }
-
 
 std::string UpdateVertexSentence::toString() const {
     std::string buf;
@@ -200,7 +188,6 @@ std::string UpdateVertexSentence::toString() const {
 
     return buf;
 }
-
 
 std::string UpdateEdgeSentence::toString() const {
     std::string buf;
@@ -268,12 +255,22 @@ std::string DeleteEdgeSentence::toString() const {
 }
 
 std::string DownloadSentence::toString() const {
-    return folly::stringPrintf("DOWNLOAD HDFS \"%s:%d/%s\"", host_.get()->c_str(),
-                               port_, path_.get()->c_str());
+    return graphSpaceName_ == nullptr
+               ? folly::stringPrintf("DOWNLOAD %s INTO %s", dataSource_.get()->c_str(),
+                                     localDir_.get()->c_str())
+               : folly::stringPrintf("DOWNLOAD %s INTO %s FOR %s", dataSource_.get()->c_str(),
+                                     localDir_.get()->c_str(), graphSpaceName_.get()->c_str());
 }
 
 std::string IngestSentence::toString() const {
-    return "INGEST";
+    return graphSpaceName_ == nullptr
+               ? folly::stringPrintf("INGEST %s", localDir_.get()->c_str())
+               : folly::stringPrintf("INGEST %s FOR %s", localDir_.get()->c_str(),
+                                     graphSpaceName_.get()->c_str());
 }
 
-}   // namespace nebula
+std::string AbortJobSentence::toString() const {
+    return folly::stringPrintf("ABORT JOB %s", jobName_.get()->c_str());
+}
+
+}  // namespace nebula

@@ -18,7 +18,7 @@ class ConfigRowItem;
 
 class ShowSentence final : public Sentence {
 public:
-    enum class ShowType : uint32_t {
+    enum class ShowType : uint8_t {
         kUnknown,
         kShowHosts,
         kShowSpaces,
@@ -29,16 +29,20 @@ public:
         kShowRoles,
         kShowCreateSpace,
         kShowCreateTag,
-        kShowCreateEdge
+        kShowCreateEdge,
+        // show all tasks
+        kShowJobs,
+        // show a single task
+        kShowJob
     };
 
     explicit ShowSentence(ShowType sType) {
-        kind_ = Kind::kShow;
+        kind_ = Sentence::Kind::kShow;
         showType_ = std::move(sType);
     }
 
     ShowSentence(ShowType sType, std::string *name) {
-        kind_ = Kind::kShow;
+        kind_ = Sentence::Kind::kShow;
         name_.reset(name);
         showType_ = std::move(sType);
     }
@@ -89,7 +93,7 @@ private:
 class AddHostsSentence final : public Sentence {
 public:
     AddHostsSentence() {
-        kind_ = Kind::kAddHosts;
+        kind_ = Sentence::Kind::kAddHosts;
     }
 
     void setHosts(HostList *hosts) {
@@ -110,7 +114,7 @@ private:
 class RemoveHostsSentence final : public Sentence {
 public:
     RemoveHostsSentence() {
-        kind_ = Kind::kRemoveHosts;
+        kind_ = Sentence::Kind::kRemoveHosts;
     }
 
     void setHosts(HostList *hosts) {
@@ -217,7 +221,7 @@ class CreateSpaceSentence final : public Sentence {
 public:
     explicit CreateSpaceSentence(std::string *spaceName) {
         spaceName_.reset(spaceName);
-        kind_ = Kind::kCreateSpace;
+        kind_ = Sentence::Kind::kCreateSpace;
     }
 
     const std::string* spaceName() const {
@@ -247,7 +251,7 @@ class DropSpaceSentence final : public Sentence {
 public:
     explicit DropSpaceSentence(std::string *spaceName) {
         spaceName_.reset(spaceName);
-        kind_ = Kind::kDropSpace;
+        kind_ = Sentence::Kind::kDropSpace;
     }
 
     const std::string* spaceName() const {
@@ -265,7 +269,7 @@ class DescribeSpaceSentence final : public Sentence {
 public:
     explicit DescribeSpaceSentence(std::string *spaceName) {
         spaceName_.reset(spaceName);
-        kind_ = Kind::kDescribeSpace;
+        kind_ = Sentence::Kind::kDescribeSpace;
     }
 
     const std::string* spaceName() const {
@@ -329,12 +333,12 @@ public:
     };
 
     explicit ConfigSentence(SubType subType) {
-        kind_ = Kind::kConfig;
+        kind_ = Sentence::Kind::kConfig;
         subType_ = std::move(subType);
     }
 
     ConfigSentence(SubType subType, ConfigRowItem* item) {
-        kind_ = Kind::kConfig;
+        kind_ = Sentence::Kind::kConfig;
         subType_ = std::move(subType);
         configItem_.reset(item);
     }
@@ -365,7 +369,7 @@ public:
 
     // TODO: add more subtype for balance
     explicit BalanceSentence(SubType subType) {
-        kind_ = Kind::kBalance;
+        kind_ = Sentence::Kind::kBalance;
         subType_ = std::move(subType);
     }
 

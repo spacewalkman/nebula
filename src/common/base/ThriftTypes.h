@@ -26,7 +26,8 @@ using EdgeRanking = int64_t;
 using EdgeVersion = int64_t;
 using SchemaVer = int64_t;
 using UserID = int32_t;
+using JobID = std::string;
+using TaskID = std::string;
 
-}  // namespace nebula
-#endif  // COMMON_BASE_THRIFTTYPES_H_
-
+} // namespace nebula
+#endif // COMMON_BASE_THRIFTTYPES_H_

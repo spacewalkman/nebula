@@ -110,6 +110,11 @@ public:
                               std::string&& prefix,
                               std::unique_ptr<KVIterator>* iter) = delete;
 
+    virtual void asyncPut(GraphSpaceID spaceId,
+                          PartitionID  partId,
+                          KV keyValue,
+                          KVCallback cb) = 0;
+
     virtual void asyncMultiPut(GraphSpaceID spaceId,
                                PartitionID  partId,
                                std::vector<KV> keyValues,

@@ -41,13 +41,13 @@ public:
     // Besides, we must exclude `Status' and `StatusOr<V>' from `U'.
     //
     // TODO(dutor) we may take other cases into account in future,
-    // e.g. convertible but not constructible.
+    // e.g. convertible but not constructable.
     template <typename U>
     static constexpr auto is_initializable_v = is_constructible_v<T, U> &&
                                                !is_status_or_v<U> &&
                                                !is_status_v<U>;
 
-    // Assert that `T' must be copy/move constructible
+    // Assert that `T' must be copy/move constructable
     static_assert(is_copy_or_move_constructible_v<T>, "`T' must be copy/move constructible");
 
     // Assert that `T' must not be of type reference
@@ -62,7 +62,7 @@ public:
     // `StatusOr<T>' contains neither a Status nor a value
     // in the default-constructed case.
     // From the semantics aspect, it must have been associated with
-    // a Status or value eventualy before being used.
+    // a Status or value eventually before being used.
     StatusOr() {
         state_ = kVoid;
     }

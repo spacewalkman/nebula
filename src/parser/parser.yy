@@ -98,10 +98,11 @@ class GraphScanner;
 %token KW_EDGE KW_EDGES KW_STEPS KW_OVER KW_UPTO KW_REVERSELY KW_SPACE KW_DELETE KW_FIND
 %token KW_INT KW_BIGINT KW_DOUBLE KW_STRING KW_BOOL KW_TAG KW_TAGS KW_UNION KW_INTERSECT KW_MINUS
 %token KW_NO KW_OVERWRITE KW_IN KW_DESCRIBE KW_DESC KW_SHOW KW_HOSTS KW_TIMESTAMP KW_ADD
-%token KW_PARTITION_NUM KW_REPLICA_FACTOR KW_DROP KW_REMOVE KW_SPACES KW_INGEST KW_UUID
+%token KW_PARTITION_NUM KW_REPLICA_FACTOR KW_DROP KW_REMOVE KW_SPACES KW_UUID
+%token KW_INGEST KW_DOWNLOAD KW_FOR KW_HDFS KW_INTO KW_TASK KW_TASKS
 %token KW_IF KW_NOT KW_EXISTS KW_WITH KW_FIRSTNAME KW_LASTNAME KW_EMAIL KW_PHONE KW_USER KW_USERS
 %token KW_PASSWORD KW_CHANGE KW_ROLE KW_GOD KW_ADMIN KW_GUEST KW_GRANT KW_REVOKE KW_ON
-%token KW_ROLES KW_BY KW_DOWNLOAD KW_HDFS
+%token KW_ROLES KW_BY
 %token KW_VARIABLES KW_GET KW_DECLARE KW_GRAPH KW_META KW_STORAGE
 %token KW_TTL_DURATION KW_TTL_COL
 %token KW_ORDER KW_ASC
@@ -197,13 +198,12 @@ class GraphScanner;
 %type <sentence> traverse_sentence set_sentence piped_sentence assignment_sentence fetch_sentence
 %type <sentence> maintain_sentence insert_vertex_sentence insert_edge_sentence
 %type <sentence> mutate_sentence update_vertex_sentence update_edge_sentence delete_vertex_sentence delete_edge_sentence
-%type <sentence> ingest_sentence
+%type <sentence> download_sentence ingest_sentence abort_job_sentence
 %type <sentence> show_sentence add_hosts_sentence remove_hosts_sentence create_space_sentence describe_space_sentence
 %type <sentence> drop_space_sentence
 %type <sentence> yield_sentence
 %type <sentence> create_user_sentence alter_user_sentence drop_user_sentence change_password_sentence
 %type <sentence> grant_sentence revoke_sentence
-%type <sentence> download_sentence
 %type <sentence> set_config_sentence get_config_sentence balance_sentence
 %type <sentence> sentence
 %type <sentences> sentences
@@ -1262,14 +1262,6 @@ delete_vertex_sentence
     }
     ;
 
-download_sentence
-    : KW_DOWNLOAD KW_HDFS STRING {
-        auto sentence = new DownloadSentence();
-        sentence->setUrl($3);
-        $$ = sentence;
-    }
-    ;
-
 edge_list
     : vid R_ARROW vid {
         $$ = new EdgeList();
@@ -1285,13 +1277,6 @@ delete_edge_sentence
     : KW_DELETE KW_EDGE edge_list where_clause {
         auto sentence = new DeleteEdgeSentence($3);
         sentence->setWhereClause($4);
-        $$ = sentence;
-    }
-    ;
-
-ingest_sentence
-    : KW_INGEST {
-        auto sentence = new IngestSentence();
         $$ = sentence;
     }
     ;
@@ -1329,6 +1314,13 @@ show_sentence
     }
     | KW_SHOW KW_CREATE KW_EDGE name_label {
         $$ = new ShowSentence(ShowSentence::ShowType::kShowCreateEdge, $4);
+    }
+    //TODO: To be implemented!
+    | KW_SHOW KW_JOBS {
+        $$ = new ShowSentence(ShowSentence::ShowType::kShowJobs);
+    }
+    | KW_SHOW KW_JOB name_label {
+        $$ = new ShowSentence(ShowSentence::ShowType::kShowJob, $3);
     }
     ;
 
@@ -1597,6 +1589,34 @@ balance_sentence
     }
     ;
 
+download_sentence
+    // download into specified local dir for current graph space
+    : KW_DOWNLOAD name_label KW_INTO name_label{
+        $$ = new DownloadSentence($2, $4);
+    }
+    // download into specified local dir for specified graph space
+    | KW_DOWNLOAD name_label KW_INTO name_label KW_FOR name_label  {
+        $$ = new DownloadSentence($2, $4, $6);
+    }
+    ;
+
+ingest_sentence
+    // ingest into current graph space
+    : KW_INGEST name_label {
+        $$ = new IngestSentence($2);
+    }
+    // ingest into specified graph space
+    | KW_INGEST name_label KW_FOR name_label {
+        $$ = new IngestSentence($2, $4);
+    }
+    ;
+
+abort_job_sentence
+    : KW_ABORT KW_JOB name_label {
+        $$ = new AbortJobSentence($3);
+    }
+    ;
+
 mutate_sentence
     : insert_vertex_sentence { $$ = $1; }
     | insert_edge_sentence { $$ = $1; }
@@ -1638,6 +1658,7 @@ maintain_sentence
     | get_config_sentence { $$ = $1; }
     | set_config_sentence { $$ = $1; }
     | balance_sentence { $$ = $1; }
+    | abort_job_sentence { $$ = $1; }
     ;
 
 sentence

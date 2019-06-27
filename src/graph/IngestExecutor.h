@@ -7,10 +7,10 @@
 #ifndef GRAPH_INGESTEXECUTOR_H
 #define GRAPH_INGESTEXECUTOR_H
 
-#include "base/Base.h"
+#include "base/Base.h"q
 #include "graph/Executor.h"
 
-namespace nebula {
+namespace nebula {q
 namespace graph {
 
 class IngestExecutor final : public Executor {
@@ -25,11 +25,8 @@ public:
 
     void execute() override;
 
-    void setupResponse(cpp2::ExecutionResponse &resp) override;
-
 private:
-    IngestSentence                             *sentence_{nullptr};
-    std::unique_ptr<cpp2::ExecutionResponse>    resp_;
+    IngestSentence                          *sentence_{nullptr};
 };
 
 }   // namespace graph

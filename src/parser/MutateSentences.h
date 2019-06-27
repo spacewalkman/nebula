@@ -14,93 +14,81 @@ namespace nebula {
 
 class PropertyList final {
 public:
-    void addProp(std::string *propname) {
-        properties_.emplace_back(propname);
-    }
+    void addProp(std::string *propname) { properties_.emplace_back(propname); }
 
     std::string toString() const;
 
-    std::vector<std::string*> properties() const {
-        std::vector<std::string*> result;
+    std::vector<std::string *> properties() const {
+        std::vector<std::string *> result;
         result.resize(properties_.size());
-        auto get = [] (const auto &ptr) { return ptr.get(); };
+        auto get = [](const auto &ptr) { return ptr.get(); };
         std::transform(properties_.begin(), properties_.end(), result.begin(), get);
         return result;
     }
 
 private:
-    std::vector<std::unique_ptr<std::string>>   properties_;
+    std::vector<std::unique_ptr<std::string>> properties_;
 };
-
 
 class VertexTagItem final {
- public:
-     explicit VertexTagItem(std::string *tagName, PropertyList *properties = nullptr) {
-         tagName_.reset(tagName);
-         properties_.reset(properties);
-     }
-
-     std::string toString() const;
-
-     const std::string* tagName() const {
-         return tagName_.get();
-     }
-
-     std::vector<std::string*> properties() const {
-         if (nullptr == properties_) {
-             return {};
-         }
-         return properties_->properties();
-     }
-
- private:
-     std::unique_ptr<std::string>               tagName_;
-     std::unique_ptr<PropertyList>              properties_;
-};
-
-
-class VertexTagList final {
- public:
-     void addTagItem(VertexTagItem *tagItem) {
-         tagItems_.emplace_back(tagItem);
-     }
-
-     std::string toString() const;
-
-     std::vector<VertexTagItem*> tagItems() const {
-         std::vector<VertexTagItem*> result;
-         result.reserve(tagItems_.size());
-         for (auto &item : tagItems_) {
-             result.emplace_back(item.get());
-         }
-         return result;
-     }
-
- private:
-     std::vector<std::unique_ptr<VertexTagItem>>    tagItems_;
-};
-
-
-class ValueList final {
 public:
-    void addValue(Expression *value) {
-        values_.emplace_back(value);
+    explicit VertexTagItem(std::string *tagName, PropertyList *properties = nullptr) {
+        tagName_.reset(tagName);
+        properties_.reset(properties);
     }
 
     std::string toString() const;
 
-    std::vector<Expression*> values() const {
-        std::vector<Expression*> result;
+    const std::string *tagName() const { return tagName_.get(); }
+
+    std::vector<std::string *> properties() const {
+        if (nullptr == properties_) {
+            return {};
+        }
+        return properties_->properties();
+    }
+
+private:
+    std::unique_ptr<std::string> tagName_;
+    std::unique_ptr<PropertyList> properties_;
+};
+
+class VertexTagList final {
+public:
+    void addTagItem(VertexTagItem *tagItem) { tagItems_.emplace_back(tagItem); }
+
+    std::string toString() const;
+
+    std::vector<VertexTagItem *> tagItems() const {
+        std::vector<VertexTagItem *> result;
+        result.reserve(tagItems_.size());
+        for (auto &item : tagItems_) {
+            result.emplace_back(item.get());
+        }
+        return result;
+    }
+
+private:
+    std::vector<std::unique_ptr<VertexTagItem>> tagItems_;
+};
+
+class ValueList final {
+public:
+    void addValue(Expression *value) { values_.emplace_back(value); }
+
+    std::string toString() const;
+
+    std::vector<Expression *> values() const {
+        std::vector<Expression *> result;
         result.resize(values_.size());
-        auto get = [] (const auto &ptr) { return ptr.get(); };
+        auto get = [](const auto &ptr) { return ptr.get(); };
         std::transform(values_.begin(), values_.end(), result.begin(), get);
         return result;
     }
 
 private:
-    std::vector<std::unique_ptr<Expression>>    values_;
+    std::vector<std::unique_ptr<Expression>> values_;
 };
-
 
 class VertexRowItem final {
 public:
@@ -109,27 +97,20 @@ public:
         values_.reset(values);
     }
 
-    Expression* id() const {
-        return id_.get();
-    }
+    Expression *id() const { return id_.get(); }
 
-    std::vector<Expression*> values() const {
-        return values_->values();
-    }
+    std::vector<Expression *> values() const { return values_->values(); }
 
     std::string toString() const;
 
 private:
-    std::unique_ptr<Expression>                 id_;
-    std::unique_ptr<ValueList>                  values_;
+    std::unique_ptr<Expression> id_;
+    std::unique_ptr<ValueList> values_;
 };
-
 
 class VertexRowList final {
 public:
-    void addRow(VertexRowItem *row) {
-        rows_.emplace_back(row);
-    }
+    void addRow(VertexRowItem *row) { rows_.emplace_back(row); }
 
     /**
      * For now, we haven't execution plan cache supported.
@@ -139,10 +120,10 @@ public:
      * In the future, we might do deep copy to the plan,
      * of course excluding the volatile arguments in queries.
      */
-    std::vector<VertexRowItem*> rows() const {
-        std::vector<VertexRowItem*> result;
+    std::vector<VertexRowItem *> rows() const {
+        std::vector<VertexRowItem *> result;
         result.resize(rows_.size());
-        auto get = [] (const auto &ptr) { return ptr.get(); };
+        auto get = [](const auto &ptr) { return ptr.get(); };
         std::transform(rows_.begin(), rows_.end(), result.begin(), get);
         return result;
     }
@@ -153,38 +134,28 @@ private:
     std::vector<std::unique_ptr<VertexRowItem>> rows_;
 };
 
-
 class InsertVertexSentence final : public Sentence {
 public:
-    InsertVertexSentence(VertexTagList *tagList,
-                         VertexRowList *rows,
-                         bool overwritable = true) {
+    InsertVertexSentence(VertexTagList *tagList, VertexRowList *rows, bool overwritable = true) {
         tagList_.reset(tagList);
         rows_.reset(rows);
         overwritable_ = overwritable;
         kind_ = Kind::kInsertVertex;
     }
 
-    bool overwritable() const {
-        return overwritable_;
-    }
+    bool overwritable() const { return overwritable_; }
 
-    auto tagItems() const {
-        return tagList_->tagItems();
-    }
+    auto tagItems() const { return tagList_->tagItems(); }
 
-    std::vector<VertexRowItem*> rows() const {
-        return rows_->rows();
-    }
+    std::vector<VertexRowItem *> rows() const { return rows_->rows(); }
 
     std::string toString() const override;
 
 private:
-    bool                                        overwritable_{true};
-    std::unique_ptr<VertexTagList>              tagList_;
-    std::unique_ptr<VertexRowList>              rows_;
+    bool overwritable_{true};
+    std::unique_ptr<VertexTagList> tagList_;
+    std::unique_ptr<VertexRowList> rows_;
 };
-
 
 class EdgeRowItem final {
 public:
@@ -201,42 +172,31 @@ public:
         values_.reset(values);
     }
 
-    auto srcid() const {
-        return srcid_.get();
-    }
+    auto srcid() const { return srcid_.get(); }
 
-    auto dstid() const {
-        return dstid_.get();
-    }
+    auto dstid() const { return dstid_.get(); }
 
-    auto rank() const {
-        return rank_;
-    }
+    auto rank() const { return rank_; }
 
-    std::vector<Expression*> values() const {
-        return values_->values();
-    }
+    std::vector<Expression *> values() const { return values_->values(); }
 
     std::string toString() const;
 
 private:
-    std::unique_ptr<Expression>                 srcid_;
-    std::unique_ptr<Expression>                 dstid_;
-    EdgeRanking                                 rank_{0};
-    std::unique_ptr<ValueList>                  values_;
+    std::unique_ptr<Expression> srcid_;
+    std::unique_ptr<Expression> dstid_;
+    EdgeRanking rank_{0};
+    std::unique_ptr<ValueList> values_;
 };
-
 
 class EdgeRowList final {
 public:
-    void addRow(EdgeRowItem *row) {
-        rows_.emplace_back(row);
-    }
+    void addRow(EdgeRowItem *row) { rows_.emplace_back(row); }
 
-    std::vector<EdgeRowItem*> rows() const {
-        std::vector<EdgeRowItem*> result;
+    std::vector<EdgeRowItem *> rows() const {
+        std::vector<EdgeRowItem *> result;
         result.resize(rows_.size());
-        auto get = [] (const auto &ptr) { return ptr.get(); };
+        auto get = [](const auto &ptr) { return ptr.get(); };
         std::transform(rows_.begin(), rows_.end(), result.begin(), get);
         return result;
     }
@@ -244,60 +204,42 @@ public:
     std::string toString() const;
 
 private:
-    std::vector<std::unique_ptr<EdgeRowItem>>   rows_;
+    std::vector<std::unique_ptr<EdgeRowItem>> rows_;
 };
-
 
 class InsertEdgeSentence final : public Sentence {
 public:
-    InsertEdgeSentence() {
-        kind_ = Kind::kInsertEdge;
-    }
+    InsertEdgeSentence() { kind_ = Kind::kInsertEdge; }
 
-    void setOverwrite(bool overwritable) {
-        overwritable_ = overwritable;
-    }
+    void setOverwrite(bool overwritable) { overwritable_ = overwritable; }
 
-    bool overwritable() const {
-        return overwritable_;
-    }
+    bool overwritable() const { return overwritable_; }
 
-    void setEdge(std::string *edge) {
-        edge_.reset(edge);
-    }
+    void setEdge(std::string *edge) { edge_.reset(edge); }
 
-    const std::string* edge() const {
-        return edge_.get();
-    }
+    const std::string *edge() const { return edge_.get(); }
 
-    void setProps(PropertyList *props) {
-        properties_.reset(props);
-    }
+    void setProps(PropertyList *props) { properties_.reset(props); }
 
-    std::vector<std::string*> properties() const {
+    std::vector<std::string *> properties() const {
         if (nullptr == properties_) {
             return {};
         }
         return properties_->properties();
     }
 
-    void setRows(EdgeRowList *rows) {
-        rows_.reset(rows);
-    }
+    void setRows(EdgeRowList *rows) { rows_.reset(rows); }
 
-    std::vector<EdgeRowItem*> rows() const {
-        return rows_->rows();
-    }
+    std::vector<EdgeRowItem *> rows() const { return rows_->rows(); }
 
     std::string toString() const override;
 
 private:
-    bool                                        overwritable_{true};
-    std::unique_ptr<std::string>                edge_;
-    std::unique_ptr<PropertyList>               properties_;
-    std::unique_ptr<EdgeRowList>                rows_;
+    bool overwritable_{true};
+    std::unique_ptr<std::string> edge_;
+    std::unique_ptr<PropertyList> properties_;
+    std::unique_ptr<EdgeRowList> rows_;
 };
-
 
 class UpdateItem final {
 public:
@@ -322,16 +264,13 @@ public:
     std::string toString() const;
 
 private:
-    std::unique_ptr<std::string>                field_;
-    std::unique_ptr<Expression>                 value_;
+    std::unique_ptr<std::string> field_;
+    std::unique_ptr<Expression> value_;
 };
-
 
 class UpdateList final {
 public:
-    void addItem(UpdateItem *item) {
-        items_.emplace_back(item);
-    }
+    void addItem(UpdateItem *item) { items_.emplace_back(item); }
 
     std::vector<UpdateItem*> items() const {
         std::vector<UpdateItem*> result;
@@ -345,12 +284,12 @@ public:
     std::string toString() const;
 
 private:
-    std::vector<std::unique_ptr<UpdateItem>>    items_;
+    std::vector<std::unique_ptr<UpdateItem>> items_;
 };
-
 
 class UpdateVertexSentence final : public Sentence {
 public:
+<<<<<<< HEAD
     UpdateVertexSentence() {
         kind_ = Kind::kUpdateVertex;
     }
@@ -387,9 +326,15 @@ public:
         return whenClause_.get();
     }
 
-    void setYieldClause(YieldClause *clause) {
-        yieldClause_.reset(clause);
-    }
+    void setInsertable(bool insertable) { insertable_ = insertable; }
+
+    void setVid(Expression *vid) { vid_.reset(vid); }
+
+    void setUpdateList(UpdateList *items) { updateItems_.reset(items); }
+
+    void setWhereClause(WhereClause *clause) { whereClause_.reset(clause); }
+
+    void setYieldClause(YieldClause *clause) { yieldClause_.reset(clause); }
 
     const YieldClause* yieldClause() const {
         return yieldClause_.get();
@@ -405,9 +350,9 @@ private:
     std::unique_ptr<YieldClause>                yieldClause_;
 };
 
-
 class UpdateEdgeSentence final : public Sentence {
 public:
+<<<<<<< HEAD
     UpdateEdgeSentence() {
         kind_ = Kind::kUpdateEdge;
     }
@@ -469,9 +414,7 @@ public:
         return whenClause_.get();
     }
 
-    void setYieldClause(YieldClause *clause) {
-        yieldClause_.reset(clause);
-    }
+    void setYieldClause(YieldClause *clause) { yieldClause_.reset(clause); }
 
     const YieldClause* yieldClause() const {
         return yieldClause_.get();
@@ -491,7 +434,6 @@ private:
     std::unique_ptr<YieldClause>                yieldClause_;
 };
 
-
 class DeleteVertexSentence final : public Sentence {
 public:
     explicit DeleteVertexSentence(Expression *vid) {
@@ -499,34 +441,26 @@ public:
         kind_ = Kind::kDeleteVertex;
     }
 
-    Expression* vid() const {
-        return vid_.get();
-    }
+    Expression *vid() const { return vid_.get(); }
 
     std::string toString() const override;
 
 private:
-    std::unique_ptr<Expression>                  vid_;
+    std::unique_ptr<Expression> vid_;
 };
-
 
 class EdgeList final {
 public:
-    void addEdge(Expression *srcid, Expression *dstid) {
-        edges_.emplace_back(srcid, dstid);
-    }
+    void addEdge(Expression *srcid, Expression *dstid) { edges_.emplace_back(srcid, dstid); }
 
-    const auto& edges() const {
-        return edges_;
-    }
+    const auto &edges() const { return edges_; }
 
     std::string toString() const;
 
 private:
     using EdgeItem = std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>;
-    std::vector<EdgeItem>                       edges_;
+    std::vector<EdgeItem> edges_;
 };
-
 
 class DeleteEdgeSentence final : public Sentence {
 public:
@@ -535,102 +469,79 @@ public:
         kind_ = Kind::kDeleteEdge;
     }
 
-    const EdgeList* edgeList() const {
-        return edgeList_.get();
-    }
+    const EdgeList *edgeList() const { return edgeList_.get(); }
 
-    void setWhereClause(WhereClause *clause) {
-        whereClause_.reset(clause);
-    }
+    void setWhereClause(WhereClause *clause) { whereClause_.reset(clause); }
 
-    const WhereClause* whereClause() const {
-        return whereClause_.get();
-    }
+    const WhereClause *whereClause() const { return whereClause_.get(); }
 
     std::string toString() const override;
 
 private:
-    std::unique_ptr<EdgeList>                   edgeList_;
-    std::unique_ptr<WhereClause>                whereClause_;
+    std::unique_ptr<EdgeList> edgeList_;
+    std::unique_ptr<WhereClause> whereClause_;
 };
-
 
 class DownloadSentence final : public Sentence {
 public:
-    DownloadSentence() {
+    DownloadSentence(std::string *dataSource, std::string *localDir,
+                     std::string *graphSpaceName = nullptr) {
+        dataSource_.reset(dataSource);
+        graphSpaceName_.reset(graphSpaceName);
+        localDir_.reset(localDir);
         kind_ = Kind::kDownload;
     }
 
-    const std::string* host() const {
-        return host_.get();
-    }
+    const std::string *getDataSource() const { return dataSource_.get(); }
 
-    void setHost(std::string *host) {
-        host_.reset(host);
-    }
+    const std::string *getGraphSpaceName() const { return graphSpaceName_.get(); }
 
-    const int32_t port() const {
-        return port_;
-    }
-
-    void setPort(int32_t port) {
-        port_ = port;
-    }
-
-    const std::string* path() const {
-        return path_.get();
-    }
-
-    void setPath(std::string *path) {
-        path_.reset(path);
-    }
-
-    void setUrl(std::string *url) {
-        static std::string hdfsPrefix = "hdfs://";
-        if (url->find(hdfsPrefix) != 0) {
-            LOG(ERROR) << "URL should start with " << hdfsPrefix;
-            delete url;
-            return;
-        }
-
-        std::string u = url->substr(hdfsPrefix.size(), url->size());
-        std::vector<folly::StringPiece> tokens;
-        folly::split(":", u, tokens);
-        if (tokens.size() == 2) {
-            host_ = std::make_unique<std::string>(tokens[0]);
-            int32_t position = tokens[1].find_first_of("/");
-            if (position != -1) {
-                try {
-                    port_ = folly::to<int32_t>(tokens[1].toString().substr(0, position).c_str());
-                } catch (const std::exception& ex) {
-                    LOG(ERROR) << "URL's port parse failed: " << *url;
-                }
-                path_ = std::make_unique<std::string>(
-                            tokens[1].toString().substr(position, tokens[1].size()));
-            } else {
-                LOG(ERROR) << "URL Parse Failed: " << *url;
-            }
-        } else {
-            LOG(ERROR) << "URL Parse Failed: " << *url;
-        }
-        delete url;
-    }
+    const std::string *getLocalDir() const { return localDir_.get(); }
 
     std::string toString() const override;
 
 private:
-    std::unique_ptr<std::string>                host_;
-    int32_t                                     port_;
-    std::unique_ptr<std::string>                path_;
+    std::unique_ptr<std::string> dataSource_;
+    std::unique_ptr<std::string> graphSpaceName_;
+    std::unique_ptr<std::string> localDir_;
 };
 
 class IngestSentence final : public Sentence {
 public:
-    IngestSentence() {
+    IngestSentence(std::string *localDir, std::string *graphSpaceName = nullptr) {
+        localDir_.reset(localDir);
+        graphSpaceName_.reset(graphSpaceName);
         kind_ = Kind::kIngest;
     }
 
+    const std::string *getGraphSpaceName() const { return graphSpaceName_.get(); }
+
+    /**
+     * ingest from which local dir
+     */
+    const std::string *getLocalDir() const { return localDir_.get(); }
+
     std::string toString() const override;
+
+private:
+    std::unique_ptr<std::string> graphSpaceName_;
+    std::unique_ptr<std::string> localDir_;
 };
+
+class AbortJobSentence final : public Sentence {
+public:
+    AbortJobSentence(std::string *jobName) {
+        jobName_.reset(jobName);
+        kind_ = Kind::kAbortJob;
+    }
+
+    const std::string *getJobName() const { return jobName_.get(); }
+
+    std::string toString() const override;
+
+private:
+    std::unique_ptr<std::string> jobName_;
+};
+
 }  // namespace nebula
 #endif  // PARSER_MUTATESENTENCES_H_

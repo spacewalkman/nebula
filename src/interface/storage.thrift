@@ -19,8 +19,8 @@ enum ErrorCode {
     E_RPC_FAILURE = -3,
 
     // storage failures
-    E_LEADER_CHANGED = -11,
-    E_KEY_HAS_EXISTS = -12,
+    E_LEADER_CHANGED  = -11,
+    E_KEY_HAS_EXISTS  = -12,
     E_SPACE_NOT_FOUND = -13,
     E_PART_NOT_FOUND = -14,
     E_KEY_NOT_FOUND = -15,
@@ -28,8 +28,8 @@ enum ErrorCode {
 
     // meta failures
     E_EDGE_PROP_NOT_FOUND = -21,
-    E_TAG_PROP_NOT_FOUND = -22,
-    E_IMPROPER_DATA_TYPE = -23,
+    E_TAG_PROP_NOT_FOUND  = -22,
+    E_IMPROPER_DATA_TYPE  = -23,
 
     // Invalid request
     E_INVALID_FILTER = -31,
@@ -40,6 +40,13 @@ enum ErrorCode {
 
     // meta client failed
     E_LOAD_META_FAILED = -41,
+
+    // IO error when DOWNLOAD & INGEST sst files
+    E_CONCURRENT_DOWNLOAD = -51,
+    E_IMPORT_UNKOWN = -52,
+    E_HOLE_IN_PART_ALLOCATION = -53,
+    E_LOCAL_DIR_NOT_EXIST = -54,
+
     E_UNKNOWN = -100,
 } (cpp.enum_strict)
 
@@ -69,10 +76,10 @@ enum StatType {
 } (cpp.enum_strict)
 
 struct ResultCode {
-    1: required ErrorCode code,
-    2: required common.PartitionID part_id,
+    1: required ErrorCode           code,
+    2: required common.PartitionID  part_id,
     // Only valid when code is E_LEADER_CHANAGED.
-    3: optional common.HostAddr  leader,
+    3: optional common.HostAddr     leader,
 }
 
 struct EdgeData {
@@ -339,6 +346,46 @@ struct GetUUIDResp {
     2: common.VertexID id,
 }
 
+// Import data related
+enum ImportDataPhase {
+    // distributed downloading phase
+    DOWNLOAD = 1,
+
+    // rocksdb ingest sst files phase
+    INGEST = 2,
+} (cpp.enum_strict)
+
+struct DownloadSstFilesRequest {
+    1: common.GraphSpaceID space_id,
+    2: common.PartitionID part_id,
+    3: string hdfs_dir,
+    4: string local_dir,
+}
+
+// wrap common.DownloadSstFilesRequest with taskID & partitionIds
+struct StorageDownloadSstFileReq {
+    1: common.JobID                     job_id,
+    2: set<common.PartitionID>          partition_ids,
+    3: common.DownloadSstFilesReq       request_from_meta,
+}
+
+struct StorageIngestSstFileReq {
+    1: common.JobID                     job_id,
+    2: set<common.PartitionID>          partition_ids,
+    3: common.IngestSstFilesReq     request_from_meta,
+}
+
+// TODO： Handle retry?
+struct ImportFilesResp {
+   1: ErrorCode        code,
+}
+
+struct ReportProgressResp {
+   // Whether the RPC call to meta server succeed
+   1: ErrorCode        code,
+}
+// end import data related
+
 service StorageService {
     QueryResponse getBound(1: GetNeighborsRequest req)
 
@@ -365,7 +412,17 @@ service StorageService {
     AdminExecResp waitingForCatchUpData(1: CatchUpDataReq req);
     AdminExecResp removePart(1: RemovePartReq req);
     AdminExecResp memberChange(1: MemberChangeReq req);
+
     GetLeaderResp getLeaderPart(1: GetLeaderReq req);
+
+    ImportDataResponse downloadSstFiles(1: DownloadSstFilesRequest req);
+    ImportDataResponse ingestSstFiles(1: IngestSstFilesRequest req);
+
+    // Download & Ingest related operations
+    ImportFilesResp downloadSstFiles(1: StorageDownloadSstFileReq req);
+    ImportFilesResp ingestSstFiles(1: StorageIngestSstFileReq req);
+
+    ReportProgressResp reportProgess(1: common.UpdateProgressReq req);
 
     // Interfaces for key-value storage
     ExecResponse      put(1: PutRequest req);

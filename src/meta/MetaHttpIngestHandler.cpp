@@ -155,7 +155,7 @@ bool MetaHttpIngestHandler::ingestSSTFiles(GraphSpaceID space) {
                 break;
             }
         }
-    }).wait();
+    }).wait(); //TODO：这里不应该阻塞调用
     LOG(INFO) << "Ingest tasks have finished";
     return successfully;
 }

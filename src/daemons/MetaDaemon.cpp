@@ -133,6 +133,7 @@ bool initWebService(nebula::kvstore::KVStore* kvstore,
     nebula::WebService::registerHandler("/status", [] {
         return new nebula::meta::MetaHttpStatusHandler();
     });
+    //TODO:这里在基于thrift的实现之后应该删除
     nebula::WebService::registerHandler("/download-dispatch", [kvstore, helper, pool] {
         auto handler = new nebula::meta::MetaHttpDownloadHandler();
         handler->init(kvstore, helper, pool);
@@ -239,7 +240,7 @@ int main(int argc, char *argv[]) {
     }
 
     auto handler = std::make_shared<nebula::meta::MetaServiceHandler>(kvstore.get(), gClusterId);
-    LOG(INFO) << "The meta deamon start on " << localhost;
+    LOG(INFO) << "The meta daemon start on " << localhost;
     try {
         gServer = std::make_unique<apache::thrift::ThriftServer>();
         gServer->setPort(FLAGS_port);

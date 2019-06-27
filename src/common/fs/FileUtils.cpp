@@ -116,10 +116,10 @@ std::string FileUtils::basename(const char *path) {
     if (::strcmp("/", path) == 0) {
         return "";
     }
-    static const std::regex pattern("(/*([^/]+/+)*)([^/]+)/?");
+    static const std::regex pattern("(hdfs:)?(/*([^/]+/+)*)([^/]+)/?", std::regex::icase);
     std::cmatch result;
     std::regex_match(path, result, pattern);
-    return result[3].str();
+    return result[4].str();
 }
 
 
@@ -356,7 +356,8 @@ std::vector<std::string> FileUtils::listAllTypedEntitiesInDir(
         const char* dirpath,
         FileType type,
         bool returnFullPath,
-        const char* namePattern) {
+        const char* namePattern,
+        bool ignoreCase) {
     std::vector<std::string> entities;
     struct dirent *dirInfo;
     DIR *dir = opendir(dirpath);
@@ -364,6 +365,12 @@ std::vector<std::string> FileUtils::listAllTypedEntitiesInDir(
         LOG(ERROR)<< "Failed to read the directory \"" << dirpath
                   << "\" (" << errno << "): " << strerror(errno);
         return entities;
+    }
+
+    auto flags = FNM_FILE_NAME | FNM_PERIOD;
+    if (ignoreCase) {
+        //TODO: This is GNU extension, would introduce some portability issue
+        flags |= FNM_CASEFOLD;
     }
 
     while ((dirInfo = readdir(dir)) != nullptr) {
@@ -379,7 +386,7 @@ std::vector<std::string> FileUtils::listAllTypedEntitiesInDir(
                 continue;
             }
             if (namePattern &&
-                fnmatch(namePattern, dirInfo->d_name, FNM_FILE_NAME | FNM_PERIOD)) {
+                fnmatch(namePattern, dirInfo->d_name, flags)) {
                 // Mismatched
                 continue;
             }
@@ -399,22 +406,26 @@ std::vector<std::string> FileUtils::listAllTypedEntitiesInDir(
 std::vector<std::string> FileUtils::listAllFilesInDir(
         const char* dirpath,
         bool returnFullPath,
-        const char* namePattern) {
+        const char* namePattern,
+        bool ignoreCase) {
     return listAllTypedEntitiesInDir(dirpath,
                                      FileType::REGULAR,
                                      returnFullPath,
-                                     namePattern);
+                                     namePattern,
+                                     ignoreCase);
 }
 
 
 std::vector<std::string> FileUtils::listAllDirsInDir(
         const char* dirpath,
         bool returnFullPath,
-        const char* namePattern) {
+        const char* namePattern,
+        bool ignoreCase) {
     return listAllTypedEntitiesInDir(dirpath,
                                      FileType::DIRECTORY,
                                      returnFullPath,
-                                     namePattern);
+                                     namePattern,
+                                     ignoreCase);
 }
 
 

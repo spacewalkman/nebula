@@ -78,7 +78,7 @@ struct ConfigItem {
     VariantType         value_;
 };
 
-// config cahce, get config via module and name
+// config cache, get config via module and name
 using MetaConfigMap = std::unordered_map<std::pair<cpp2::ConfigModule, std::string>, ConfigItem>;
 
 class MetaChangedListener {
@@ -95,7 +95,7 @@ class MetaClient {
     FRIEND_TEST(ConfigManTest, MockConfigTest);
 
 public:
-    explicit MetaClient(std::shared_ptr<folly::IOThreadPoolExecutor> ioThreadPool,
+    MetaClient(std::shared_ptr<folly::IOThreadPoolExecutor> ioThreadPool,
                         std::vector<HostAddr> addrs,
                         HostAddr localHost = HostAddr(0, 0),
                         ClusterID clusterId = 0,
@@ -230,7 +230,11 @@ public:
     folly::Future<StatusOr<std::vector<cpp2::ConfigItem>>>
     listConfigs(const cpp2::ConfigModule& module);
 
-    // Opeartions for cache.
+    // Operations for cache.
+    cpp2::ConfigModule& getGflagsModule() {return gflagsModule_;}
+
+    void setGflagsModule(const cpp2::ConfigModule& module = cpp2::ConfigModule::UNKNOWN);
+
     StatusOr<GraphSpaceID> getSpaceIdByNameFromCache(const std::string& name);
 
     StatusOr<TagID> getTagIDByNameFromCache(const GraphSpaceID& space, const std::string& name);
@@ -269,6 +273,8 @@ public:
     const std::vector<HostAddr>& getAddresses();
 
     Status refreshCache();
+
+    folly::Future<StatusOr<bool>> remove(std::string segment, std::string key);
 
 protected:
     void loadDataThreadFunc();
@@ -337,8 +343,7 @@ protected:
 
     ConfigItem toConfigItem(const cpp2::ConfigItem& item);
 
-    PartsMap doGetPartsMap(const HostAddr& host,
-                           const LocalCache& localCache);
+    PartsMap doGetPartsMap(const HostAddr& host, const LocalCache& localCache);
 
 private:
     std::shared_ptr<folly::IOThreadPoolExecutor> ioThreadPool_;

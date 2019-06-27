@@ -1,10 +1,18 @@
-nebula_add_library(
-    fs_obj OBJECT
-    FileUtils.cpp
-    TempDir.cpp
-    TempFile.cpp
-)
+file(GLOB FILE_SRCS LIST_DIRECTORIES false *.cpp)
 
 nebula_add_subdirectory(test)
 
+message(STATUS "before remove HdfsUtils" ${FILE_SRCS})
+message(STATUS "LIBHDFS_PATH = " ${LIBHDFS_PATH})
 
+if (NOT ENABLE_HDFS_IMPORT_SUPPORT)
+    list(REMOVE_ITEM ${FILE_SRCS} HdfsUtils.cpp)
+    nebula_add_library(fs_obj OBJECT ${FILE_SRCS})
+else ()
+    nebula_add_library(fs_obj OBJECT ${FILE_SRCS})
+    target_link_libraries(fs_obj PUBLIC ${LIBHDFS_PATH} ${JAVA_JVM_LIBRARY})
+endif (NOT ENABLE_HDFS_IMPORT_SUPPORT)
+
+add_dependencies(fs_obj base_obj)
+
+add_subdirectory(test)

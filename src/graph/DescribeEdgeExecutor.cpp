@@ -31,7 +31,7 @@ void DescribeEdgeExecutor::execute() {
     auto *name = sentence_->name();
     auto spaceId = ectx()->rctx()->session()->space();
 
-    // Get the lastest ver
+    // Get the latest version
     auto future = ectx()->getMetaClient()->getEdgeSchema(spaceId, *name);
     auto *runner = ectx()->rctx()->runner();
 

@@ -31,8 +31,7 @@ std::string ShowSentence::toString() const {
         case ShowType::kShowCreateEdge:
             return folly::stringPrintf("SHOW CREATE EDGE %s", name_.get()->c_str());
         case ShowType::kUnknown:
-        default:
-            FLOG_FATAL("Type illegal");
+        default:FLOG_FATAL("Type illegal");
     }
     return "Unknown";
 }

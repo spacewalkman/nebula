@@ -86,7 +86,7 @@ private:
     Response                                    resp_;
     folly::Promise<Response>                    promise_;
     std::shared_ptr<ClientSession>              session_;
-    folly::Executor                            *runner_{nullptr};
+    folly::Executor                             *runner_{nullptr};
 };
 
 }   // namespace graph

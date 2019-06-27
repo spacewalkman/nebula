@@ -12,16 +12,11 @@ namespace graph {
 
 using nebula::network::NetworkUtils;
 
-ShowExecutor::ShowExecutor(Sentence *sentence,
-                           ExecutionContext *ectx) : Executor(ectx) {
-    sentence_ = static_cast<ShowSentence*>(sentence);
+ShowExecutor::ShowExecutor(Sentence *sentence, ExecutionContext *ectx) : Executor(ectx) {
+    sentence_ = static_cast<ShowSentence *>(sentence);
 }
 
-
-Status ShowExecutor::prepare() {
-    return Status::OK();
-}
-
+Status ShowExecutor::prepare() { return Status::OK(); }
 
 void ShowExecutor::execute() {
     if (sentence_->showType() == ShowSentence::ShowType::kShowTags ||
@@ -62,21 +57,27 @@ void ShowExecutor::execute() {
             break;
         case ShowSentence::ShowType::kShowCreateEdge:
             showCreateEdge();
+        case ShowSentence::ShowType::KShowJobs:
+            // TODO(qianyong)
+            onError_(Status::Error("Show all jobs is not implemented!"));
+            break;
+        case ShowSentence::ShowType::KShowJob:
+            // TODO(qianyong)
+            onError_(Status::Error("Show a single job is not implemented!"));
             break;
         case ShowSentence::ShowType::kUnknown:
             onError_(Status::Error("Type unknown"));
             break;
-        // intentionally no `default'
+            // intentionally no `default'
     }
 }
-
 
 void ShowExecutor::showHosts() {
     auto future = ectx()->getMetaClient()->listHosts();
     auto *runner = ectx()->rctx()->runner();
     constexpr static char kNoValidPart[] = "No valid partition";
 
-    auto cb = [this] (auto &&resp) {
+    auto cb = [this](auto &&resp) {
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -85,8 +86,12 @@ void ShowExecutor::showHosts() {
 
         auto hostItems = std::move(resp).value();
         std::vector<cpp2::RowValue> rows;
-        std::vector<std::string> header{"Ip", "Port", "Status", "Leader count",
-                                        "Leader distribution", "Partition distribution"};
+        std::vector<std::string> header{"Ip",
+                                        "Port",
+                                        "Status",
+                                        "Leader count",
+                                        "Leader distribution",
+                                        "Partition distribution"};
         resp_ = std::make_unique<cpp2::ExecutionResponse>();
         resp_->set_column_names(std::move(header));
         std::sort(hostItems.begin(), hostItems.end(), [](const auto& a, const auto& b) {
@@ -97,7 +102,7 @@ void ShowExecutor::showHosts() {
             return a.get_status() < b.get_status();
         });
 
-        for (auto& item : hostItems) {
+        for (auto &item : hostItems) {
             std::vector<cpp2::ColumnValue> row;
             row.resize(6);
             auto hostAddr = HostAddr(item.hostAddr.ip, item.hostAddr.port);
@@ -115,7 +120,7 @@ void ShowExecutor::showHosts() {
 
             int32_t leaderCount = 0;
             std::string leaders;
-            for (auto& spaceEntry : item.get_leader_parts()) {
+            for (auto &spaceEntry : item.get_leader_parts()) {
                 leaderCount += spaceEntry.second.size();
                 leaders += spaceEntry.first + ": " +
                            folly::to<std::string>(spaceEntry.second.size()) + ", ";
@@ -134,7 +139,7 @@ void ShowExecutor::showHosts() {
             if (!parts.empty()) {
                 parts.resize(parts.size() - 2);
             } else {
-                // if there is no valid parition on a host at all
+                // if there is no valid partition on a host at all
                 leaders = kNoValidPart;
                 parts = kNoValidPart;
             }
@@ -150,22 +155,20 @@ void ShowExecutor::showHosts() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
         return;
     };
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
 
-
 void ShowExecutor::showSpaces() {
     auto future = ectx()->getMetaClient()->listSpaces();
     auto *runner = ectx()->rctx()->runner();
 
-    auto cb = [this] (auto &&resp) {
+    auto cb = [this](auto &&resp) {
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -191,16 +194,14 @@ void ShowExecutor::showSpaces() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
         return;
     };
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
-
 
 void ShowExecutor::showTags() {
     auto spaceId = ectx()->rctx()->session()->space();
@@ -208,7 +209,7 @@ void ShowExecutor::showTags() {
     auto *runner = ectx()->rctx()->runner();
     resp_ = std::make_unique<cpp2::ExecutionResponse>();
 
-    auto cb = [this] (auto &&resp) {
+    auto cb = [this](auto &&resp) {
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -239,23 +240,21 @@ void ShowExecutor::showTags() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
         return;
     };
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
-
 
 void ShowExecutor::showEdges() {
     auto spaceId = ectx()->rctx()->session()->space();
     auto future = ectx()->getMetaClient()->listEdgeSchemas(spaceId);
     auto *runner = ectx()->rctx()->runner();
 
-    auto cb = [this] (auto &&resp) {
+    auto cb = [this](auto &&resp) {
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -285,23 +284,21 @@ void ShowExecutor::showEdges() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
         return;
     };
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
-
 
 void ShowExecutor::showCreateSpace() {
     auto *name = sentence_->getName();
     auto future = ectx()->getMetaClient()->getSpace(*name);
     auto *runner = ectx()->rctx()->runner();
 
-    auto cb = [this] (auto &&resp) {
+    auto cb = [this](auto &&resp) {
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -328,7 +325,8 @@ void ShowExecutor::showCreateSpace() {
         buf += folly::to<std::string>(properties.get_replica_factor());
         buf += ")";
 
-        row[1].set_str(buf);;
+        row[1].set_str(buf);
+        ;
         rows.emplace_back();
         rows.back().set_columns(std::move(row));
         resp_->set_rows(std::move(rows));
@@ -337,29 +335,26 @@ void ShowExecutor::showCreateSpace() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
         return;
     };
 
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
 
-
 void ShowExecutor::showCreateTag() {
     auto *name = sentence_->getName();
     auto spaceId = ectx()->rctx()->session()->space();
 
-    // Get the lastest ver
+    // Get the latest ver
     auto future = ectx()->getMetaClient()->getTagSchema(spaceId, *name);
     auto *runner = ectx()->rctx()->runner();
 
-
-    auto cb = [this] (auto &&resp) {
-        auto *tagName =  sentence_->getName();
+    auto cb = [this](auto &&resp) {
+        auto *tagName = sentence_->getName();
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -380,7 +375,7 @@ void ShowExecutor::showCreateTag() {
         buf += folly::stringPrintf("CREATE TAG %s (\n", tagName->c_str());
 
         auto schema = resp.value();
-        for (auto& item : schema.columns) {
+        for (auto &item : schema.columns) {
             buf += "  ";
             buf += item.name;
             buf += " ";
@@ -389,7 +384,7 @@ void ShowExecutor::showCreateTag() {
         }
 
         if (!schema.columns.empty()) {
-            buf.resize(buf.size() -2);
+            buf.resize(buf.size() - 2);
             buf += "\n";
         }
         buf += ") ";
@@ -416,16 +411,14 @@ void ShowExecutor::showCreateTag() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
     };
 
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
-
 
 void ShowExecutor::showCreateEdge() {
     auto *name = sentence_->getName();
@@ -435,8 +428,8 @@ void ShowExecutor::showCreateEdge() {
     auto future = ectx()->getMetaClient()->getEdgeSchema(spaceId, *name);
     auto *runner = ectx()->rctx()->runner();
 
-    auto cb = [this] (auto &&resp) {
-        auto *edgeName =  sentence_->getName();
+    auto cb = [this](auto &&resp) {
+        auto *edgeName = sentence_->getName();
         if (!resp.ok()) {
             DCHECK(onError_);
             onError_(std::move(resp).status());
@@ -454,10 +447,10 @@ void ShowExecutor::showCreateEdge() {
 
         std::string buf;
         buf.reserve(256);
-        buf += folly::stringPrintf("CREATE EDGE %s (\n",  edgeName->c_str());
+        buf += folly::stringPrintf("CREATE EDGE %s (\n", edgeName->c_str());
 
         auto schema = resp.value();
-        for (auto& item : schema.columns) {
+        for (auto &item : schema.columns) {
             buf += "  ";
             buf += item.name;
             buf += " ";
@@ -466,7 +459,7 @@ void ShowExecutor::showCreateEdge() {
         }
 
         if (!schema.columns.empty()) {
-            buf.resize(buf.size() -2);
+            buf.resize(buf.size() - 2);
             buf += "\n";
         }
         buf += ") ";
@@ -493,20 +486,16 @@ void ShowExecutor::showCreateEdge() {
         onFinish_();
     };
 
-    auto error = [this] (auto &&e) {
+    auto error = [this](auto &&e) {
         LOG(ERROR) << "Exception caught: " << e.what();
         DCHECK(onError_);
-        onError_(Status::Error(folly::stringPrintf("Internal error : %s",
-                                                   e.what().c_str())));
+        onError_(Status::Error(folly::stringPrintf("Internal error : %s", e.what().c_str())));
     };
 
     std::move(future).via(runner).thenValue(cb).thenError(error);
 }
 
+void ShowExecutor::setupResponse(cpp2::ExecutionResponse &resp) { resp = std::move(*resp_); }
 
-void ShowExecutor::setupResponse(cpp2::ExecutionResponse &resp) {
-    resp = std::move(*resp_);
-}
-
-}   // namespace graph
-}   // namespace nebula
+}  // namespace graph
+}  // namespace nebula

@@ -40,6 +40,14 @@ enum ErrorCode {
     E_INVALID_PASSWORD       = -41,
     E_INPROPER_ROLE          = -42,
 
+    //  IO error when DOWNLOAD & INGEST sst files
+    E_KVSTORE                               = -51,
+    E_CONCURRENT_DOWNLOAD                   = -52,
+    E_HOLE_IN_PART_ALLOCATION               = -53,
+    E_LOCAL_DIR_NOT_EXIST                   = -54,
+    E_INCONSIST_PART_BETWEEN_HDFS_AND_META  = -55,
+    E_IMPORT_UNKOWN                         = -56,
+
     E_UNKNOWN        = -99,
 } (cpp.enum_strict)
 
@@ -508,7 +516,68 @@ struct ListConfigsReq {
 struct ListConfigsResp {
     1: ErrorCode            code,
     2: common.HostAddr      leader,
-    3: list<ConfigItem>     items,
+    3: list<ConfigItem>     items
+}
+
+
+// TODO：这里是用来storage有更新时回调的
+// TODO: 是否要提供为某个partition单独download一个sst文件的接口？
+struct UpdateProgressResp {
+    1: ErrorCode        code,
+    // Valid when code = SUCCEEDED
+    2: i64              detal,
+}
+
+struct LongRunningJobResp {
+    1: common.JobID     job_id,
+    2: ErrorCode        code,
+}
+
+struct ShowAllJobsReq {
+}
+
+struct ShowImportJobReq {
+    1: common.JobID    Job_id,
+}
+
+// Progress info for a single partition
+struct PartitionProgress {
+    1: common.PartitionID   partition_id,
+    2: i64                  start_time,
+    3: i64                  end_time,
+    4: i64                  total_count,
+    5: i64                  success_count,
+    6: i64                  error_count,
+}
+
+// A 'show Job' report content for download Job totally
+struct ShowDownloadJobResp {
+    1: common.GraphSpaceID      space_id,
+    2: i64                      start_time,
+    3: i64                      end_time,
+    4: string                   hdfs_dir,
+    5: string                   local_dir,
+    // When one partition fails, Job in total will be marked as failed
+    6: common.JobStatus         job_status,
+    7: list<PartitionProgress>  progresses,
+}
+
+struct ShowIngestJobResp {
+    1: common.GraphSpaceID      space_id,
+    2: i64                      start_time,
+    3: i64                      end_time,
+    4: string                   local_dir,
+    5: common.JobStatus         job_status,
+    6: list<PartitionProgress>  progresses,
+}
+
+struct KillJobReq {
+    1: common.JobID  Job_id,
+}
+
+struct KillJobResp {
+    1: common.JobID             job_id,
+    2: common.JobStatus         job_status,
 }
 
 service MetaService {
@@ -561,5 +630,15 @@ service MetaService {
     GetConfigResp getConfig(1: GetConfigReq req);
     ExecResp setConfig(1: SetConfigReq req);
     ListConfigsResp listConfigs(1: ListConfigsReq req);
+
+    // Download & Ingest
+    LongRunningJobResp downloadSstFiles(1: common.DownloadSstFilesReq req);
+    LongRunningJobResp ingestSstFiles(1: common.IngestSstFilesReq req);
+
+    // Report progress to meta server
+    UpdateProgressResp updateProgress(1: common.UpdateProgressReq req);
+    ShowDownloadJobResp showDownloadJob(1: ShowImportJobReq req);
+    ShowIngestJobResp showIngestJob(1: ShowImportJobReq req);
+    KillJobResp killJob(1: KillJobReq req);
 }
 

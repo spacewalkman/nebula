@@ -156,6 +156,17 @@ folly::Future<cpp2::GetUUIDResp>
 StorageServiceHandler::future_getUUID(const cpp2::GetUUIDReq& req) {
     auto* processor = GetUUIDProcessor::instance(kvstore_);
     RETURN_FUTURE(processor);
+
+folly::Future<cpp2::ImportFilesResp>
+StorageServiceHandler::future_downloadSstFiles(const cpp2::StorageDownloadSstFileReq& req) {
+  auto* processor = DownloadSstFilesProcessor::instance(kvstore_);
+  RETURN_FUTURE(processor);
+}
+
+folly::Future<cpp2::ImportFilesResp>
+StorageServiceHandler::future_ingestSstFiles(const cpp2::StorageIngestSstFileReq& req) {
+  auto* processor = IngestSstFilesProcessor::instance(kvstore_);
+  RETURN_FUTURE(processor);
 }
 
 }  // namespace storage

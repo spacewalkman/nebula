@@ -122,7 +122,8 @@ public:
         const char* dirpath,
         FileType type,
         bool returnFullPath,
-        const char* namePattern);
+        const char* namePattern,
+        bool ignoreCase = false);
     /**
      * List all files in the given directory
      *
@@ -131,7 +132,8 @@ public:
     static std::vector<std::string> listAllFilesInDir(
         const char* dirpath,
         bool returnFullPath = false,
-        const char* namePattern = nullptr);
+        const char* namePattern = nullptr,
+        bool ignoreCase = false);
     /**
      * List all sub-directories in the given directory
      *
@@ -140,7 +142,8 @@ public:
     static std::vector<std::string> listAllDirsInDir(
         const char* dirpath,
         bool returnFullPath = false,
-        const char* namePattern = nullptr);
+        const char* namePattern = nullptr,
+        bool ignoreCase = false);
 
     /**
      * class Iterator works like other iterators,

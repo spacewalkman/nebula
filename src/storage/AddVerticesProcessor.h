@@ -23,7 +23,7 @@ public:
     void process(const cpp2::AddVerticesRequest& req);
 
 private:
-    explicit AddVerticesProcessor(kvstore::KVStore* kvstore, meta::SchemaManager* schemaMan)
+    AddVerticesProcessor(kvstore::KVStore* kvstore, meta::SchemaManager* schemaMan)
             : BaseProcessor<cpp2::ExecResponse>(kvstore, schemaMan) {}
 };
 
