@@ -463,6 +463,30 @@ private:
     std::unique_ptr<WhereClause>                whereClause_;
 };
 
+
+class ImportDataSentence final : public Sentence {
+public:
+    explicit ImportDataSentence(std::string *dataSource, std::string *graphspaceName = nullptr) {
+        dataSource_.reset(dataSource);
+        graphspaceName_.reset(graphspaceName);
+        kind_ = Kind::KImportData;
+    }
+
+    std::string getDataSource() const {
+        return dataSource_.get();
+    }
+
+    std::string getGraphSpaceName() const {
+        return graphspaceName_.get();
+    }
+
+    std::string toString() const override;
+
+private:
+    std::unique_ptr<std::string> dataSource_;
+    std::unique_ptr<std::string> graphspaceName_;
+};
+
 }  // namespace nebula
 
 #endif  // PARSER_MUTATESENTENCES_H_

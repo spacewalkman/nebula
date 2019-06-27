@@ -15,16 +15,15 @@
 #include "graph/VariableHolder.h"
 #include "meta/client/MetaClient.h"
 
-/**
- * ExecutionContext holds context infos in the execution process, e.g. clients of storage or meta services.
- */
-
 namespace nebula {
 namespace storage {
 class StorageClient;
 }   // namespace storage
 namespace graph {
 
+/**
+ * ExecutionContext holds context infos in the execution process, e.g. clients of storage or meta services.
+ */
 class ExecutionContext final : public cpp::NonCopyable, public cpp::NonMovable {
 public:
     using RequestContextPtr = std::unique_ptr<RequestContext<cpp2::ExecutionResponse>>;
@@ -62,11 +61,11 @@ public:
     }
 
 private:
-    RequestContextPtr                           rctx_;
+    RequestContextPtr                          rctx_;
     meta::SchemaManager                        *sm_{nullptr};
     storage::StorageClient                     *storage_{nullptr};
     meta::MetaClient                           *metaClient_{nullptr};
-    std::unique_ptr<VariableHolder>             variableHolder_;
+    std::unique_ptr<VariableHolder>            variableHolder_;
 };
 
 }   // namespace graph

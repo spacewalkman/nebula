@@ -206,14 +206,14 @@ public class Importer {
 
                         switch (type.toLowerCase()) {
                           case "vertex":
-                              long id = Long.parseLong(tokenList.get(0));
+                              long id = Long.parseLong(tokenList.get<0>);
                               String vertexValue = Joiner.on(", ").join(tokenList.subList(1, tokenList.size()));
                               LOGGER.debug("vertex id {}, value {}", id, vertexValue);
                               values.add(String.format(INSERT_VERTEX_VALUE_TEMPLATE, id, vertexValue));
                               break;
                           case "edge":
-                              long source = Long.parseLong(tokenList.get(0));
-                              long target = Long.parseLong(tokenList.get(1));
+                              long source = Long.parseLong(tokenList.get<0>);
+                              long target = Long.parseLong(tokenList.get<1>);
                               String edgeValue = Joiner.on(", ").join(tokenList.subList(2, tokenList.size()));
                               LOGGER.debug("edge source {}, target {}, value : {}", source, target, edgeValue);
                               values.add(String.format(INSERT_EDGE_VALUE_TEMPLATE, source, target, edgeValue));

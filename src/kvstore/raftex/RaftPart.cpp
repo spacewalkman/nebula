@@ -768,26 +768,26 @@ bool RaftPart::leaderElection() {
         auto eb = ioThreadPool_->getEventBase();
         auto futures = collectNSucceeded(
             gen::from(*hosts)
-            | gen::map([eb, self = shared_from_this(), &voteReq] (
+                | gen::map([eb, self = shared_from_this(), &voteReq] (
                     decltype(peerHosts_)::element_type::value_type& host) {
-                VLOG(2) << self->idStr_
-                        << "Sending AskForVoteRequest to "
-                        << NetworkUtils::intToIPv4(host.first.first)
-                        << ":" << host.first.second;
-                return via(
-                    eb,
-                    [&voteReq, &host] ()
-                            -> Future<cpp2::AskForVoteResponse> {
+                  VLOG(2) << self->idStr_
+                          << "Sending AskForVoteRequest to "
+                          << NetworkUtils::intToIPv4(host.first.first)
+                          << ":" << host.first.second;
+                  return via(
+                      eb,
+                      [&voteReq, &host] ()
+                          -> Future<cpp2::AskForVoteResponse> {
                         return host.second->askForVote(voteReq);
-                    });
-            })
-            | gen::as<std::vector>(),
+                      });
+                })
+                | gen::as<std::vector>(),
             // Number of succeeded required
             quorum_,
             // Result evaluator
             [](cpp2::AskForVoteResponse& resp) {
-                return resp.get_error_code()
-                    == cpp2::ErrorCode::SUCCEEDED;
+              return resp.get_error_code()
+                  == cpp2::ErrorCode::SUCCEEDED;
             });
 
         VLOG(2) << idStr_

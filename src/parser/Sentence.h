@@ -50,6 +50,7 @@ public:
         kGrant,
         kRevoke,
         kChangePassword,
+        KImportData
     };
 
     Kind kind() const {

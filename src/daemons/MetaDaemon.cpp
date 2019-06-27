@@ -25,7 +25,7 @@ DEFINE_string(data_path, "", "Root data path");
 DEFINE_string(peers, "", "It is a list of IPs split by comma,"
                          "the ips number equals replica number."
                          "If empty, it means replica is 1");
-DEFINE_string(local_ip, "", "Local ip speicified for NetworkUtils::getLocalIP");
+DEFINE_string(local_ip, "", "Local ip specified for NetworkUtils::getLocalIP");
 DEFINE_int32(num_workers, 4, "Number of worker threads");
 DEFINE_int32(num_io_threads, 16, "Number of IO threads");
 DECLARE_string(part_man_type);

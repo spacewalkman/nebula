@@ -29,6 +29,10 @@ enum ErrorCode {
     E_TAG_PROP_NOT_FOUND = -22,
     E_IMPROPER_DATA_TYPE = -23,
 
+    // IO error when DOWNLOAD & INGEST sst files
+    E_IMPORT_FILE_NOT_FOUND = -31,
+    E_IMPORT_FILE_BAD_FORMAT = -32,
+
     E_UNKNOWN = -100,
 } (cpp.enum_strict)
 
@@ -160,6 +164,50 @@ struct AddEdgesRequest {
     3: bool overwritable,
 }
 
+// Import data related
+enum ImportDataPhase {
+    // distributed downloading phase
+    DOWNLOAD = 1,
+
+    // rocksdb ingest sst files phase
+    INGEST = 2,
+} (cpp.enum_strict)
+
+struct DownloadSstFilesRequest {
+    1: common.GraphSpaceID space_id,
+    2: common.PartitionID part_id,
+    3: string hdfs_dir,
+    4: string local_dir,
+}
+
+struct IngestSstFilesRequest {
+    1: common.GraphSpaceID space_id,
+    2: common.PartitionID part_id,
+    3: string local_dir,
+    // what we do when graphspace is not empty:
+    // true = clear all data before run, will be used in scenario like `ReImport`
+    // false = leave exsiting data alone, ingest anyway
+    4: bool purge_before_run,
+}
+
+struct ImportDataResponse {
+    // import task handle for client to monitor status
+    1: i32 taskId,
+    // what phase we are in
+    2: required ImportDataPhase phase,
+    // progress counter
+    3: i32 totalCount,
+    4: i32 finishedCount,
+
+    // Error context, populate only when error occurs, include:
+    // 1. which partition
+    // 2. which storageEngine instance(hostAddr)
+    // 3. what kind of error
+    5: list<ResultCode> failed_codes,
+}
+
+// end import data related
+
 service StorageService {
     QueryResponse getOutBound(1: GetNeighborsRequest req)
     QueryResponse getInBound(1: GetNeighborsRequest req)
@@ -173,5 +221,8 @@ service StorageService {
 
     ExecResponse addVertices(1: AddVerticesRequest req);
     ExecResponse addEdges(1: AddEdgesRequest req);
+
+    ImportDataResponse downloadSstFiles(1: DownloadSstFilesRequest req);
+    ImportDataResponse ingestSstFiles(1: IngestSstFilesRequest req);
 }
 

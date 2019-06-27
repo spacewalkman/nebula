@@ -417,6 +417,19 @@ struct CheckPasswordReq {
     2: string encoded_pwd,
 }
 
+struct ImportDataReq {
+    1: string source,
+    2: common.GraphSpaceID space_id,
+    // what we do when graphspace has data already
+    3: bool   overwritable,
+}
+
+struct ImportDataResp {
+    1: common.GraphSpaceID space_id,
+    // a task id for polling status
+    2: optional i64 taskId,
+}
+
 service MetaService {
     ExecResp createSpace(1: CreateSpaceReq req);
     ExecResp dropSpace(1: DropSpaceReq req);
@@ -461,5 +474,6 @@ service MetaService {
     ExecResp changePassword(1: ChangePasswordReq req);
     ExecResp checkPassword(1: CheckPasswordReq req);
 
+    ImportDataResp importData(1: ImportDataReq req);
 }
 

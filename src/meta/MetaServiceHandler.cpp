@@ -251,5 +251,11 @@ MetaServiceHandler::future_checkPassword(const cpp2::CheckPasswordReq& req) {
     RETURN_FUTURE(processor);
 }
 
+folly::Future<cpp2::ImportDataResp>
+MetaServiceHandler::future_importData(const cpp2::ImportDataReq& req) {
+    auto* processor = ImportDataProcessor::instance(kvstore_);
+    RETURN_FUTURE(processor);
+}
+
 }  // namespace meta
 }  // namespace nebula

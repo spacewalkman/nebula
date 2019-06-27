@@ -96,6 +96,9 @@ BY                          ([Bb][Yy])
 IN                          ([Ii][Nn])
 TTL_DURATION                ([Tt][Tt][Ll][_][Dd][Uu][Rr][Aa][Tt][Ii][Oo][Nn])
 TTL_COL                     ([Tt][Tt][Ll][_][Cc][Oo][Ll])
+IMPORT                      ([Ii][Mm][Pp][Oo][Rr][Tt])
+DATA                        ([Dd][Aa][Tt][Aa])
+INTO                        ([Ii][Nn][Tt][Oo])
 
 LABEL                       ([a-zA-Z][_a-zA-Z0-9]*)
 DEC                         ([0-9])
@@ -182,6 +185,10 @@ IP_OCTET                    ([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])
 {IN}                        { return TokenType::KW_IN; }
 {TTL_DURATION}              { return TokenType::KW_TTL_DURATION; }
 {TTL_COL}                   { return TokenType::KW_TTL_COL; }
+{IMPORT}                    { return TokenType::KW_IMPORT; }
+{DATA}                      { return TokenType::KW_DATA; }
+{INTO}                      { return TokenType::KW_INTO; }
+
 {TRUE}                      { yylval->boolval = true; return TokenType::BOOL; }
 {FALSE}                     { yylval->boolval = false; return TokenType::BOOL; }
 

@@ -35,6 +35,16 @@ TEST(FileUtils, basename) {
     ASSERT_EQ("log", FileUtils::basename("/var/log"));
     ASSERT_EQ("var", FileUtils::basename("var"));
     ASSERT_EQ("var", FileUtils::basename("var/"));
+
+    ASSERT_EQ("some_file.suffix",
+        FileUtils::basename("hdfs://host:1000/some/dir/some_file.suffix"));
+    ASSERT_EQ("some_file.suffix",
+        FileUtils::basename("hdfs:////////host:1000/some/dir/some_file.suffix"));
+    ASSERT_EQ("some_file.suffix",
+        FileUtils::basename("hdfs://host:1000/some/dir/some_file.suffix/"));
+
+    ASSERT_EQ("SOME_file.suffix",
+        FileUtils::basename("HDFS://host:1000/some/dir/SOME_file.suffix"));
 }
 
 
@@ -255,11 +265,21 @@ TEST(FileUtils, listContentInDir) {
     EXPECT_NE(symlinks.end(),
               std::find(symlinks.begin(), symlinks.end(), "symlink2"));
 
-    // List files
-    auto files = FileUtils::listAllFilesInDir(dirTemp, true, nullptr);
-    EXPECT_EQ(2, files.size());
-    EXPECT_NE(files.end(), std::find(files.begin(), files.end(), fn1));
-    EXPECT_NE(files.end(), std::find(files.begin(), files.end(), fn2));
+    // List files w/o wildcard
+    auto filesWithoutWildCard = FileUtils::listAllFilesInDir(dirTemp, true, nullptr);
+    EXPECT_EQ(2, filesWithoutWildCard.size());
+    EXPECT_NE(filesWithoutWildCard.end(), std::find(files.begin(),
+              filesWithoutWildCard.end(), fn1));
+    EXPECT_NE(filesWithoutWildCard.end(), std::find(files.begin(),
+              filesWithoutWildCard.end(), fn2));
+
+    // List files w wildcard
+    auto filesWithWildCard = FileUtils::listAllFilesInDir(dirTemp, true, "FiLe*");
+    EXPECT_EQ(2, filesWithWildCard.size());
+    EXPECT_NE(filesWithWildCard.end(), std::find(filesWithWildCard.begin(),
+              filesWithWildCard.end(), fn1));
+    EXPECT_NE(filesWithWildCard.end(), std::find(filesWithWildCard.begin(),
+              filesWithWildCard.end(), fn2));
 
     // List sub-directories with pattern matching
     auto dirs = FileUtils::listAllDirsInDir(dirTemp, true, "*dir2");

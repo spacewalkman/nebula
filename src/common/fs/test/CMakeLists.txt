@@ -6,6 +6,8 @@ add_executable(
 )
 nebula_link_libraries(
     file_utils_test
+    ${LIBHDFS_PATH}
+    ${JAVA_JVM_LIBRARY}
     gtest
 )
 nebula_add_test(file_utils_test)
@@ -18,6 +20,8 @@ add_executable(
 )
 nebula_link_libraries(
     temp_dir_test
+    ${LIBHDFS_PATH}
+    ${JAVA_JVM_LIBRARY}
     gtest
 )
 nebula_add_test(temp_dir_test)
@@ -35,3 +39,16 @@ nebula_link_libraries(
 )
 nebula_add_test(temp_file_test)
 
+add_executable(
+    hdfs_file_utils_test
+    HdfsUtilsTest.cpp
+    $<TARGET_OBJECTS:fs_obj>
+    $<TARGET_OBJECTS:base_obj>
+)
+nebula_link_libraries(
+    hdfs_file_utils_test
+    ${LIBHDFS_PATH}
+    ${JAVA_JVM_LIBRARY}
+    gtest
+)
+nebula_add_test(hdfs_file_utils_test)

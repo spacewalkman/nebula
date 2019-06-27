@@ -535,7 +535,7 @@ create_schema_prop_list
     }
     ;
 
- create_schema_prop_item
+create_schema_prop_item
     : KW_TTL_DURATION ASSIGN INTEGER {
         // Less than or equal to 0 means infinity, so less than 0 is equivalent to 0
         if ($3 < 0) {
@@ -1186,6 +1186,15 @@ revoke_sentence
         auto sentence = new RevokeSentence($4);
         sentence->setAclItemClause($2);
         $$ = sentence;
+    }
+    ;
+
+import_data_sentence
+    : KW_IMPORT KW_DATA name_label {
+        $$ = new ImportDataSentence($1);
+    }
+    | KW_IMPORT KW_DATA name_label KW_INTO name_label {
+        $$ = new ImportDataSentence($1, $2);
     }
     ;
 

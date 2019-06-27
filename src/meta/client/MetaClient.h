@@ -60,7 +60,7 @@ public:
 
 class MetaClient {
 public:
-    explicit MetaClient(std::shared_ptr<folly::IOThreadPoolExecutor> ioThreadPool,
+    MetaClient(std::shared_ptr<folly::IOThreadPoolExecutor> ioThreadPool,
                         std::vector<HostAddr> addrs,
                         bool sendHeartBeat = false);
 

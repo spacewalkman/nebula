@@ -25,8 +25,7 @@ std::string ShowSentence::toString() const {
         case ShowType::kShowRoles:
             return folly::stringPrintf("SHOW ROLES IN %s", name_.get()->data());
         case ShowType::kUnknown:
-        default:
-            FLOG_FATAL("Type illegal");
+        default:FLOG_FATAL("Type illegal");
     }
     return "Unknown";
 }
