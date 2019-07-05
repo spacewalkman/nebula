@@ -274,7 +274,7 @@ TEST(FileUtils, listContentInDir) {
               filesWithoutWildCard.end(), fn2));
 
     // List files w wildcard
-    auto filesWithWildCard = FileUtils::listAllFilesInDir(dirTemp, true, "FiLe*");
+    auto filesWithWildCard = FileUtils::listAllFilesInDir(dirTemp, true, "FiLe*", true);
     EXPECT_EQ(2, filesWithWildCard.size());
     EXPECT_NE(filesWithWildCard.end(), std::find(filesWithWildCard.begin(),
               filesWithWildCard.end(), fn1));
