@@ -78,7 +78,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
         for (auto& f : futures) {
             f.wait();
-            FLOG_INFO("f= %s", f.value());
+            FLOG_INFO("f= %s", f.value().data());
             ASSERT_TRUE(f.value().ok());
         }
     }
@@ -94,6 +94,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
         for (auto& f : futures) {
             f.wait();
+FLOG_INFO("f= %s", f.value().data());
             ASSERT_TRUE(f.value().ok());
         }
     }
