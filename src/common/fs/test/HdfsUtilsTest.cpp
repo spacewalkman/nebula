@@ -79,7 +79,8 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
 
         for(const auto& f : futures.value()) {
-            ASSERT_TRUE(f.get());
+            f.wait();
+            ASSERT_TRUE(f.value());
         }
     }
 
