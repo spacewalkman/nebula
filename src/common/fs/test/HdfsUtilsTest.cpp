@@ -20,9 +20,9 @@ TEST(HdfsUtilsTest, SingletonTest) {
 
     ASSERT_EQ(std::addressof(*(hdfsUtils1.get())), std::addressof(*(hdfsUtils2.get())));
 
-    const auto& a1 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
-    const auto& a2 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
-    const auto& a3 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
+    const auto& a1 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
+    const auto& a2 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
+    const auto& a3 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
 
     a1.wait();
     a2.wait();
