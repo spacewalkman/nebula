@@ -15,11 +15,16 @@
 #include <folly/gen/Base.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 
-DEFINE_string(hdfs_namenode, "localhost", "Hdfs namenode's ip");
-DEFINE_int32(namenode_port, 9000, "Hdfs namenode's port");
-DEFINE_int32(download_bufferSize, 512, "Buffer size when downloading file from hdfs");
-DEFINE_string(download_source_dir_pattern, ".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
-DEFINE_int32(download_thread_pool_size, 16, "Hdfs file download thread pool size");
+DEFINE_string(hdfs_namenode,
+"localhost", "Hdfs namenode's ip");
+DEFINE_int32(namenode_port,
+9000, "Hdfs namenode's port");
+DEFINE_int32(download_bufferSize,
+512, "Buffer size when downloading file from hdfs");
+DEFINE_string(download_source_dir_pattern,
+".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
+DEFINE_int32(download_thread_pool_size,
+16, "Hdfs file download thread pool size");
 
 namespace nebula {
 namespace fs {
@@ -104,7 +109,8 @@ StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
 // reference: https://github.com/apache/hadoop/tree/trunk/hadoop-hdfs-project/hadoop-hdfs-native-client/src/main/native/libhdfs
 bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     CHECK(fs_);
-    hdfsFile src = ::hdfsOpenFile(fs_.get(), srcFile.data(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
+    hdfsFile
+        src = ::hdfsOpenFile(fs_.get(), srcFile.data(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
     if (!src) {
         FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.data());
         return false;
@@ -150,13 +156,14 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
     hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
-    auto* subFiles = ::hdfsListDirectory(fs_.get(), hdfsFileInfo->mName, &fileCount);
+    int fileCount = -1;
+    auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
-    auto ret = std::make_unique<std::vector<std::string>>();
+    auto ret = std::make_unique < std::vector < std::string >> ();
     std::regex regex(pattern);
-    for (size_t i=0; i<fileCount; i++ ){
+    for (size_t i = 0; i < fileCount; i++) {
         if (subFiles[i].mKind == kObjectKindDirectory && regex.match(subFiles[i].name)) {
-            ret.emplace_back(subFiles[i].mName);
+            ret->emplace_back(subFiles[i].mName);
         }
     }
 
