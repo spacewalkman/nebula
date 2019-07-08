@@ -104,7 +104,8 @@ TEST(HdfsUtilsTest, StripLastFileComponentTest) {
 
 TEST(HdfsUtilsTest, ListSubDirsTest) {
     std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
-    auto ret1 = HdfsUtils::listSubDirs(parentDir, "\\d+");
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+    auto ret1 = hdfsUtils.listSubDirs(parentDir, "\\d+");
     ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
 }
 
