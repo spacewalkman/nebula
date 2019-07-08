@@ -69,7 +69,7 @@ TEST(HdfsUtilsTest, CopyFileTest) {
 
 TEST(HdfsUtilsTest, CopyDirTest) {
     auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
-    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
 
     {
         std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest/"};
