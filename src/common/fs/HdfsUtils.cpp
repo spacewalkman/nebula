@@ -156,13 +156,13 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
     hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
-    int fileCount = -1;
+    size_t fileCount = -1;
     auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
     auto ret = std::make_unique < std::vector < std::string >> ();
     std::regex regex(pattern);
     for (size_t i = 0; i < fileCount; i++) {
-        if (subFiles[i].mKind == kObjectKindDirectory && regex.match(subFiles[i].name)) {
+        if (subFiles[i].mKind == kObjectKindDirectory && std::regex_match(subFiles[i].mName, regex)) {
             ret->emplace_back(subFiles[i].mName);
         }
     }
