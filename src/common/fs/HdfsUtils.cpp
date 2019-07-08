@@ -15,14 +15,10 @@
 #include <folly/gen/Base.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 
-DEFINE_string(hdfs_namenode,
-"localhost", "Hdfs namenode's ip");
-DEFINE_int32(namenode_port,
-9000, "Hdfs namenode's port");
-DEFINE_int32(download_bufferSize,
-512, "Buffer size when downloading file from hdfs");
-DEFINE_string(download_source_dir_pattern,
-".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
+DEFINE_string(hdfs_namenode, "localhost", "Hdfs namenode's ip");
+DEFINE_int32(namenode_port, 9000, "Hdfs namenode's port");
+DEFINE_int32(download_bufferSize, 512, "Buffer size when downloading file from hdfs");
+DEFINE_string(download_source_dir_pattern, ".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
 
 namespace nebula {
 namespace fs {
@@ -34,7 +30,7 @@ std::shared_ptr<HdfsUtils> HdfsUtils::getInstance
     return instance;
 }
 
-StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
+std::vector<folly::Future<StatusOr<std::string>>>> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
                                                         folly::StringPiece localDir,
                                                         size_t depth,
                                                         bool overwrite) {
@@ -80,12 +76,18 @@ StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece
         | folly::gen::map([&](std::pair<std::string, std::string>& fpairs) {
           return folly::via(eb).then([self = shared_from_this(), &fpairs]() {
                     return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
+                 }).then([](bool status) {
+                     return Status::OK();
+                 }).onError([&](std::exception& e) {
+                     FLOG_ERROR("Copy file from %s to %s failed.",
+                                std::get<0>(fpairs), std::get<1>(fpairs));
+                     return Status::Error(std::get<0>(fpairs));
                  });
 
         })
         | folly::gen::as<std::vector>();
 
-    StatusOr<std::vector<folly::Future<bool>>> ret(std::move(futures));
+    std::vector<folly::Future<Status<std::string>>>> ret(std::move(futures));
     return ret;
 
 //
