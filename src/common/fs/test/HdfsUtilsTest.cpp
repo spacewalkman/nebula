@@ -75,11 +75,10 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest/"};
         fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
 
-
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
         for (auto& f : futures) {
             f.wait();
-            FLOG_INFO("f= %s", f.value().toString());
+            FLOG_INFO("f= %s", f.value());
             ASSERT_TRUE(f.value().ok());
         }
     }
