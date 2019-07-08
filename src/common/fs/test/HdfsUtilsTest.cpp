@@ -39,7 +39,7 @@ TEST(HdfsUtilsTest, ListRecursivelyTest) {
     std::vector<std::string> moreDepthExpected {
         "hdfs://localhost:9000/listRecursivelyTest-parent1/listRecursivelyTest/1/vertex-12345.sst",
         "hdfs://localhost:9000/listRecursivelyTest-parent1/listRecursivelyTest/2/edge-23456.sst" };
-    EXPECT_EQ(moreDepthExpected, *moreDepthResults);
+    ASSERT_EQ(moreDepthExpected, *moreDepthResults);
 }
 
 TEST(HdfsUtilsTest, CopyFileTest) {
