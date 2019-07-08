@@ -162,7 +162,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
     auto ret = std::make_unique < std::vector < std::string >> ();
     if (fileCount > 0) {
         std::regex regex(pattern);
-        for (size_t i = 0; i < fileCount; i++) {
+        for (int i = 0; i < fileCount; i++) {
             if (subFiles[i].mKind == kObjectKindDirectory
                 && std::regex_match(subFiles[i].mName, regex)) {
                 ret->emplace_back(subFiles[i].mName);
