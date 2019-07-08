@@ -15,10 +15,14 @@
 #include <folly/gen/Base.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 
-DEFINE_string(hdfs_namenode, "localhost", "Hdfs namenode's ip");
-DEFINE_int32(namenode_port, 9000, "Hdfs namenode's port");
-DEFINE_int32(download_bufferSize, 512, "Buffer size when downloading file from hdfs");
-DEFINE_string(download_source_dir_pattern, ".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
+DEFINE_string(hdfs_namenode,
+"localhost", "Hdfs namenode's ip");
+DEFINE_int32(namenode_port,
+9000, "Hdfs namenode's port");
+DEFINE_int32(download_bufferSize,
+512, "Buffer size when downloading file from hdfs");
+DEFINE_string(download_source_dir_pattern,
+".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
 
 namespace nebula {
 namespace fs {
@@ -30,11 +34,10 @@ std::shared_ptr<HdfsUtils> HdfsUtils::getInstance
     return instance;
 }
 
-//TODO: record staging status (graphspace, sourceHdfsDir, localDir, percentage)
-StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
-                                         folly::StringPiece localDir,
-                                         size_t depth,
-                                         bool overwrite) {
+StatusOr<std::vector<folly::future<bool>>> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
+                                                        folly::StringPiece localDir,
+                                                        size_t depth,
+                                                        bool overwrite) {
     CHECK(downloadThreadPool_);
     std::vector<folly::StringPiece> patterns;
     folly::split("/", FLAGS_download_source_dir_pattern, patterns, true);
@@ -52,48 +55,45 @@ StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
     }
 
     std::unique_ptr<std::vector<std::string>> files(listFiles(hdfsDir));
-    if (!files->empty()) {
-        std::vector<std::pair<std::string, std::string>> filePairs;
-        std::transform(files->begin(),
-                       files->end(),
-                       std::back_inserter(filePairs),
-                       [=](const std::string& fileName) -> std::pair<std::string, std::string> {
-                         std::vector<folly::StringPiece> components;
-                         folly::split("/", fileName, components, true);
-
-                         std::string lastDepthComponents;
-                         for (size_t i = components.size() - depth; i < components.size(); i++) {
-                             lastDepthComponents += "/" + components[i].toString();
-                         }
-
-                         return std::make_pair(fileName, localDir.toString() + lastDepthComponents);
-                       });
-
-        auto eb = downloadThreadPool_->getEventBase();
-        auto futures = collectNSucceeded(
-            folly::gen::from(filePairs)
-                | folly::gen::map([eb, self = shared_from_this()]
-                                      (std::pair<std::string, std::string>& fpairs) {
-                  return folly::via(
-                      eb,
-                      [&self, &fpairs]() -> folly::Future<bool> {
-                        return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
-                      });
-
-                })
-                | folly::gen::as<std::vector>(),
-            filePairs.size(),
-            [](bool result) {
-              return result;
-            });
-
-        futures.wait();
-        CHECK(!futures.hasException())
-            << "Got exception when copy dir from hdfs to local: "
-            << futures.result().exception().what().toStdString();
+    if (files->empty()) {
+        return Status::Error(folly::stringPrintf("Empty hdfs dir %s", hdfsDir));
     }
 
-    return Status::OK();
+    std::vector<std::pair<std::string, std::string>> filePairs;
+    std::transform(files->begin(),
+                   files->end(),
+                   std::back_inserter(filePairs),
+                   [=](const std::string& fileName) -> std::pair<std::string, std::string> {
+                     std::vector<folly::StringPiece> components;
+                     folly::split("/", fileName, components, true);
+
+                     std::string lastDepthComponents;
+                     for (size_t i = components.size() - depth; i < components.size(); i++) {
+                         lastDepthComponents += "/" + components[i].toString();
+                     }
+
+                     return std::make_pair(fileName, localDir.toString() + lastDepthComponents);
+                   });
+
+    auto eb = downloadThreadPool_->getEventBase();
+    return folly::gen::from(filePairs)
+        | folly::gen::map([eb, self = shared_from_this()]
+                              (std::pair<std::string, std::string>& fpairs) {
+          return folly::via(
+              eb,
+              [&self, &fpairs]() -> folly::Future<bool> {
+                return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
+              });
+
+        })
+        | folly::gen::as<std::vector>();
+
+//
+//        futures.wait();
+//        CHECK(!futures.hasException())
+//            << "Got exception when copy dir from hdfs to local: "
+//            << futures.result().exception().what().toStdString();
+
 
 }
 
