@@ -13,6 +13,7 @@
 #include "cpp/helpers.h"
 #include "base/Base.h"
 #include <gtest/gtest_prod.h>
+#include <folly/futures/Future.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 
 DECLARE_string(hdfs_namenode);
