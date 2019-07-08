@@ -109,7 +109,7 @@ TEST(HdfsUtilsTest, StripLastFileComponentTest) {
 TEST(HdfsUtilsTest, ListSubDirsTest) {
     std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
     auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
-    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
     auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
     for(auto subDir : *ret1){
         std::cout<< subDir << std::endl;
