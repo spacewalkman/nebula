@@ -79,7 +79,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         for (auto& f : futures) {
             f.wait();
             FLOG_INFO("f= %s", f.value().status().toString().data());
-            ASSERT_TRUE(f.value()..status().ok());
+            ASSERT_TRUE(f.value().status().ok());
         }
     }
 
@@ -95,7 +95,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         for (auto& f : futures) {
             f.wait();
             FLOG_INFO("f= %s", f.value().status().toString().data());
-            ASSERT_TRUE(f.value()..status().ok());
+            ASSERT_TRUE(f.value().status().ok());
         }
     }
 }
