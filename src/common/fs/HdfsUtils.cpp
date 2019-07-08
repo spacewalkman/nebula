@@ -15,22 +15,18 @@
 #include <folly/gen/Base.h>
 #include <folly/executors/IOThreadPoolExecutor.h>
 
-DEFINE_string(hdfs_namenode,
-"localhost", "Hdfs namenode's ip");
-DEFINE_int32(namenode_port,
-9000, "Hdfs namenode's port");
-DEFINE_int32(download_bufferSize,
-512, "Buffer size when downloading file from hdfs");
-DEFINE_string(download_source_dir_pattern,
-".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
-DEFINE_int32(download_thread_pool_size,
-16, "Hdfs file download thread pool size");
+DEFINE_string(hdfs_namenode, "localhost", "Hdfs namenode's ip");
+DEFINE_int32(namenode_port, 9000, "Hdfs namenode's port");
+DEFINE_int32(download_bufferSize, 512, "Buffer size when downloading file from hdfs");
+DEFINE_string(download_source_dir_pattern, ".+/\\d+/.+\\.sst$", "Hdfs source directory pattern");
 
 namespace nebula {
 namespace fs {
 
-std::shared_ptr<HdfsUtils> HdfsUtils::getInstance(const char* namenode, tPort port) {
-    static std::shared_ptr<HdfsUtils> instance(new HdfsUtils(namenode, port));
+std::shared_ptr<HdfsUtils> HdfsUtils::getInstance
+    (const char* namenode, tPort port,
+     std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool);
+    static std::shared_ptr<HdfsUtils> instance(new HdfsUtils(namenode, port, downloadThreadPool));
     return instance;
 }
 
@@ -39,6 +35,7 @@ StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
                                          folly::StringPiece localDir,
                                          size_t depth,
                                          bool overwrite) {
+    CHECK(downloadThreadPool_);
     std::vector<folly::StringPiece> patterns;
     folly::split("/", FLAGS_download_source_dir_pattern, patterns, true);
 
@@ -71,12 +68,6 @@ StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
 
                          return std::make_pair(fileName, localDir.toString() + lastDepthComponents);
                        });
-
-        // TODO: memory consumption should be controlled by (FLAGS_download_thread_pool_size * FLAGS_download_bufferSize)
-        if (!downloadThreadPool_) {
-            downloadThreadPool_.reset(new folly::IOThreadPoolExecutor(
-                FLAGS_download_thread_pool_size));
-        }
 
         auto eb = downloadThreadPool_->getEventBase();
         auto futures = collectNSucceeded(

@@ -30,11 +30,12 @@ class HdfsUtils final
       , public cpp::NonMovable {
     FRIEND_TEST(HdfsUtilsTest, ListRecursivelyTest);
     FRIEND_TEST(HdfsUtilsTest, ListFilesTest);
-    FRIEND_TEST(HdfsUtilsTest, LastComponentsTest);
     FRIEND_TEST(HdfsUtilsTest, StripLastFileComponentTest);
 
 public:
-    static std::shared_ptr<HdfsUtils> getInstance(const char* namenode, tPort port);
+    static std::shared_ptr<HdfsUtils> getInstance
+        (const char* namenode, tPort port,
+         std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool);
 
     StatusOr<std::string> copyDir(folly::StringPiece hdfsDir,
                                   folly::StringPiece localDir,
@@ -75,7 +76,10 @@ private:
         return ret;
     }
 
-    HdfsUtils(const char* namenode, tPort port) {
+    HdfsUtils(const char* namenode,
+              tPort port,
+              std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool) :
+        downloadThreadPool_(downloadThreadPool) {
         fs_.reset(hdfsConnect(namenode, port), [](hdfsFS hdfs) {
           if (hdfsDisconnect(hdfs)) {
               LOG(WARNING) << "hdfsDisconnect failed";
@@ -86,6 +90,7 @@ private:
     // hdfsFS is actually dynamically allocated hdfs_internal*
     std::shared_ptr<hdfs_internal> fs_ = nullptr;
 
+    //TODO: should be injeceted from Executor OR Processor
     std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool_;
 };
 

@@ -14,14 +14,16 @@ namespace nebula {
 namespace fs {
 
 TEST(HdfsUtilsTest, SingletonTest) {
-    const auto& hdfsUtils1 = HdfsUtils::getInstance("localhost", 9000);
-    const auto& hdfsUtils2 = HdfsUtils::getInstance("localhost", 9000);
+    auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
+    const auto& hdfsUtils1 = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
+    const auto& hdfsUtils2 = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
 
     ASSERT_EQ(std::addressof(*(hdfsUtils1.get())), std::addressof(*(hdfsUtils2.get())));
 }
 
 TEST(HdfsUtilsTest, ListRecursivelyTest) {
-    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+    auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
 
     //TODO: set up hdfs env to contain the required directory structure
     auto results = hdfsUtils->listFiles("/listRecursivelyTest");
@@ -58,17 +60,21 @@ TEST(HdfsUtilsTest, CopyFileTest) {
     }
 
     localFile +="/vertex-12345.sst";
-    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+
+    auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
     auto ret = hdfsUtils->copyFile(srcFile, localFile);
     ASSERT_TRUE(ret);
 }
 
 TEST(HdfsUtilsTest, CopyDirTest) {
+    auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
+    const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
+
     {
         std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest/"};
         fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
 
-        const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
         // FLOG_INFO("localDir= %s", localDir.path());
         auto ret = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
         ASSERT_TRUE(ret.status().ok());
@@ -81,8 +87,6 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest-parent1/"};
         fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
 
-        // FLOG_INFO("localDir= %s", localDir.path());
-        const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
         auto ret = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
         ASSERT_TRUE(ret.status().ok());
     }
@@ -104,6 +108,7 @@ TEST(HdfsUtilsTest, StripLastFileComponentTest) {
 
 TEST(HdfsUtilsTest, ListSubDirsTest) {
     std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
+    auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
     const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000);
     auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
     for(auto subDir : *ret1){
