@@ -43,6 +43,9 @@ public:
 
     bool copyFile(std::string& srcFile, std::string& dstFile);
 
+    std::unique_ptr<std::vector<std::string>> listSubDirs(folly::StringPiece hdfsDir,
+                                                          const std::string& pattern);
+
     bool operator==(const HdfsUtils& rhs) const {
         return this->fs_ == rhs.fs_;
     }
@@ -81,11 +84,11 @@ private:
     }
 
     HdfsUtils(const char* namenode, tPort port) {
-        fs_ = hdfsConnect(namenode, port);
+        fs_.reset(hdfsConnect(namenode, port));
     }
 
     // hdfsFS is actually dynamically allocated hdfs_internal*
-    hdfsFS fs_;
+    std::shared_ptr<hdfs_internal> fs_ = nullptr;
 
     std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool_;
 };

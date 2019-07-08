@@ -102,6 +102,12 @@ TEST(HdfsUtilsTest, StripLastFileComponentTest) {
     ASSERT_EQ("/some/parent/dir/1/", ret3);
 }
 
+TEST(HdfsUtilsTest, ListSubDirsTest) {
+    std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
+    auto ret1 = HdfsUtils::listSubDir(parentDir, "\\d+");
+    ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
+}
+
 }
 }
 
