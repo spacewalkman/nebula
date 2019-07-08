@@ -56,7 +56,7 @@ StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece
 
     std::unique_ptr<std::vector<std::string>> files(listFiles(hdfsDir));
     if (files->empty()) {
-        return Status::Error(folly::stringPrintf("Empty hdfs dir %s", hdfsDir));
+        return Status::Error(folly::stringPrintf("Empty hdfs dir %s", hdfsDir.c_str()));
     }
 
     std::vector<std::pair<std::string, std::string>> filePairs;
