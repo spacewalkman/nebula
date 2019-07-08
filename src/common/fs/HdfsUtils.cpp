@@ -85,7 +85,7 @@ StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece
         })
         | folly::gen::as<std::vector>();
 
-    StatusOr<std::vector<folly::Future<bool>>> ret(futures);
+    StatusOr<std::vector<folly::Future<bool>>> ret(std::move(futures));
     return ret;
 
 //
