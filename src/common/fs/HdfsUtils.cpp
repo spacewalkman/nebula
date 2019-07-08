@@ -34,7 +34,7 @@ std::shared_ptr<HdfsUtils> HdfsUtils::getInstance
     return instance;
 }
 
-StatusOr<std::vector<folly::future<bool>>> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
+StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
                                                         folly::StringPiece localDir,
                                                         size_t depth,
                                                         bool overwrite) {

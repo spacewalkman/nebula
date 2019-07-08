@@ -38,10 +38,10 @@ public:
         (const char* namenode, tPort port,
          std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool);
 
-    StatusOr<std::string> copyDir(folly::StringPiece hdfsDir,
-                                  folly::StringPiece localDir,
-                                  size_t depth,
-                                  bool overwrite = false);
+    StatusOr<std::vector<folly::Future<bool>>> copyDir(folly::StringPiece hdfsDir,
+                                                       folly::StringPiece localDir,
+                                                       size_t depth,
+                                                       bool overwrite = false);
 
     bool copyFile(std::string& srcFile, std::string& dstFile);
 
