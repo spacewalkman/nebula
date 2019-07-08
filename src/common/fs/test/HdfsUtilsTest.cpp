@@ -19,6 +19,16 @@ TEST(HdfsUtilsTest, SingletonTest) {
     const auto& hdfsUtils2 = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
 
     ASSERT_EQ(std::addressof(*(hdfsUtils1.get())), std::addressof(*(hdfsUtils2.get())));
+
+    const auto& a1 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
+    const auto& a2 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
+    const auto& a3 = std::async(&HdfsUtils::getInstance, nullptr, "localhost", 9000, downloadThreadPool);
+
+    a1.wait();
+    a2.wait();
+    a3.wait();
+    ASSERT_EQ(std::addressof(*(a1.get())), std::addressof(*(a2.get())));
+    ASSERT_EQ(std::addressof(*(a2.get())), std::addressof(*(a3.get())));
 }
 
 TEST(HdfsUtilsTest, ListRecursivelyTest) {
@@ -78,7 +88,6 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
         for (auto& f : futures) {
             f.wait();
-            FLOG_INFO("f= %s", f.value().status().toString().data());
             ASSERT_TRUE(f.value().status().ok());
         }
     }
@@ -94,7 +103,6 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
         for (auto& f : futures) {
             f.wait();
-            FLOG_INFO("f= %s", f.value().status().toString().data());
             ASSERT_TRUE(f.value().status().ok());
         }
     }
