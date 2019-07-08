@@ -74,10 +74,10 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
           return folly::via(eb).then([self = shared_from_this(), &fpairs]() {
                     return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
                  }).then([](bool status) {
-                     return Status::OK();
+                     return status ? Status::OK() Status::Error(std::get<0>(fpairs)):
                  }).onError([&](std::exception& e) {
                      FLOG_ERROR("Copy file from %s to %s failed.",
-                                std::get<0>(fpairs), std::get<1>(fpairs));
+                                std::get<0>(fpairs).data(), std::get<1>(fpairs).data());
                      return Status::Error(std::get<0>(fpairs));
                  });
 
