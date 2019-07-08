@@ -77,25 +77,26 @@ TEST(HdfsUtilsTest, CopyDirTest) {
 
         // FLOG_INFO("localDir= %s", localDir.path());
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
-        //std::cout <<"futures typeid=" << typeid(futures).name() << std::endl;
-
-        for(auto& f : futures.value()) {
+        for (auto& f : futures.value()) {
             f.wait();
-            //std::cout << typeid(f).name() << " , value=" << f.value()<< std::endl;
             ASSERT_TRUE(f.value());
         }
     }
 
-//    // change the pattern, so we can go one depth further
-//    FLAGS_download_source_dir_pattern = ".+/.+/\\d+/.+\\.sst$";
-//
-//    {
-//        std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest-parent1/"};
-//        fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
-//
-//        auto ret = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
-//        ASSERT_TRUE(ret.status().ok());
-//    }
+    // change the pattern, so we can go one depth further
+    FLAGS_download_source_dir_pattern = ".+/.+/\\d+/.+\\.sst$";
+
+    {
+        std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest-parent1/"};
+        fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
+
+        // FLOG_INFO("localDir= %s", localDir.path());
+        auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
+        for (auto& f : futures.value()) {
+            f.wait();
+            ASSERT_TRUE(f.value());
+        }
+    }
 }
 
 TEST(HdfsUtilsTest, StripLastFileComponentTest) {
