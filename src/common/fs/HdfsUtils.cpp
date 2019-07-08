@@ -76,17 +76,17 @@ StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece
                    });
 
     auto eb = downloadThreadPool_->getEventBase();
-    return folly::gen::from(filePairs)
-        | folly::gen::map([eb, self = shared_from_this()]
-                              (std::pair<std::string, std::string>& fpairs) {
-          return folly::via(
-              eb,
-              [&self, &fpairs]() -> folly::Future<bool> {
-                return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
-              });
+    auto futures = folly::gen::from(filePairs)
+        | folly::gen::map([&](std::pair<std::string, std::string>& fpairs) {
+          return folly::via(&eb).then( [self = shared_from_this(), &fpairs]() {
+                    return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
+                 });
 
         })
         | folly::gen::as<std::vector>();
+
+    StatusOr<std::vector<folly::Future<bool>>> ret(futures);
+    return ret;
 
 //
 //        futures.wait();
