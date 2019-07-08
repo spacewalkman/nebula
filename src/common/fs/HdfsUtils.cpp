@@ -104,7 +104,7 @@ StatusOr<std::string> HdfsUtils::copyDir(folly::StringPiece hdfsDir,
 // reference: https://github.com/apache/hadoop/tree/trunk/hadoop-hdfs-project/hadoop-hdfs-native-client/src/main/native/libhdfs
 bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     CHECK(fs_);
-    hdfsFile src = ::hdfsOpenFile(*fs_, srcFile.data(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
+    hdfsFile src = ::hdfsOpenFile(fs_get(), srcFile.data(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
     if (!src) {
         FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.data());
         return false;
@@ -133,14 +133,14 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
 
     ssize_t readSize = FLAGS_download_bufferSize;
     do {
-        readSize = ::hdfsRead(*fs_, src, buffer, FLAGS_download_bufferSize);
+        readSize = ::hdfsRead(fs_.get(), src, buffer, FLAGS_download_bufferSize);
         ::write(destFp->_fileno, buffer, readSize);
     } while (readSize == FLAGS_download_bufferSize);
 
     ::write(destFp->_fileno, buffer, readSize);
 
     ::free(buffer);
-    ::hdfsCloseFile(*fs_, src);
+    ::hdfsCloseFile(fs_.get(), src);
     ::fclose(destFp);
 
     return true;
@@ -149,8 +149,8 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
 std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPiece hdfsDir,
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
-    hdfsFileInfo* parentDir = hdfsGetPathInfo(*fs_, trimmed.data());
-    auto* subFiles = ::hdfsListDirectory(*fs_, hdfsFileInfo->mName, &fileCount);
+    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
+    auto* subFiles = ::hdfsListDirectory(fs_.get(), hdfsFileInfo->mName, &fileCount);
 
     auto ret = std::make_unique<std::vector<std::string>>();
     std::regex regex(pattern);
@@ -172,7 +172,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listFiles(folly::StringPiec
 
     auto trimmed = folly::trimWhitespace(hdfsDir);
     if (!trimmed.empty()) {
-        hdfsFileInfo* parentDir = hdfsGetPathInfo(*fs_, trimmed.data());
+        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
         if (parentDir) {
             auto results = std::make_unique < std::vector < std::string >> ();
             listRecursively(parentDir, patterns, results.get(), 0);
@@ -210,7 +210,7 @@ void HdfsUtils::listRecursively(const hdfsFileInfo* hdfsFileInfo,
     }
 
     int fileCount = 0;
-    auto* subFiles = ::hdfsListDirectory(*fs_, hdfsFileInfo->mName, &fileCount);
+    auto* subFiles = ::hdfsListDirectory(fs_.get(), hdfsFileInfo->mName, &fileCount);
     if (fileCount == 0) {
         return;
     }

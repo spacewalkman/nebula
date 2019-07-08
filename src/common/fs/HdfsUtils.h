@@ -54,14 +54,6 @@ public:
         return !(*this == rhs);
     }
 
-    ~HdfsUtils() {
-        if (hdfsDisconnect(fs_)) {
-            LOG(WARNING) << "hdfsDisconnect failed";
-        }
-
-        fs_ = nullptr;
-    }
-
 private:
     std::unique_ptr<std::vector<std::string>> listFiles(folly::StringPiece hdfsDir);
 
@@ -84,7 +76,11 @@ private:
     }
 
     HdfsUtils(const char* namenode, tPort port) {
-        fs_.reset(hdfsConnect(namenode, port));
+        fs_.reset(hdfsConnect(namenode, port), [](hdfsFS hdfs) {
+          if (hdfsDisconnect(hdfs)) {
+              LOG(WARNING) << "hdfsDisconnect failed";
+          }
+        });
     }
 
     // hdfsFS is actually dynamically allocated hdfs_internal*
