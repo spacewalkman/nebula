@@ -39,10 +39,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
     folly::split("/", FLAGS_download_source_dir_pattern, patterns, true);
 
     if (patterns.size() < depth) {
-        return Status::Error(folly::stringPrintf(
-            "Not enough depth in source dir, depth=%lu, but requested=%lu",
-            patterns.size(),
-            depth));
+        return std::vector<folly::Future<StatusOr<std::string>>>();
     }
 
     if (overwrite) {
@@ -52,7 +49,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
 
     std::unique_ptr<std::vector<std::string>> files(listFiles(hdfsDir));
     if (files->empty()) {
-        return Status::Error(folly::stringPrintf("Empty hdfs dir %s", hdfsDir.data()));
+        return std::vector<folly::Future<StatusOr<std::string>>>();
     }
 
     std::vector<std::pair<std::string, std::string>> filePairs;
@@ -87,7 +84,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
         })
         | folly::gen::as<std::vector>();
 
-    std::vector<folly::Future<Status<std::string>>>> ret(std::move(futures));
+    std::vector<folly::Future<Status<std::string>>> ret(std::move(futures));
     return ret;
 
 //
