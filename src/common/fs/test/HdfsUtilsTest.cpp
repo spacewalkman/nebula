@@ -79,8 +79,8 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
 
 
-        for(auto& f : futures.value().get()) {
-            std::cout << typeid(f).name() << " , value=" << f << std::endl;
+        for(auto& f : futures.value()) {
+            std::cout << typeid(f).name() << " , value=" << f.get() << std::endl;
             //ASSERT_TRUE(f.value());
         }
     }
