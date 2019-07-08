@@ -78,7 +78,7 @@ StatusOr<std::vector<folly::Future<bool>>> HdfsUtils::copyDir(folly::StringPiece
     auto eb = downloadThreadPool_->getEventBase();
     auto futures = folly::gen::from(filePairs)
         | folly::gen::map([&](std::pair<std::string, std::string>& fpairs) {
-          return folly::via(&eb).then( [self = shared_from_this(), &fpairs]() {
+          return folly::via(eb).then([self = shared_from_this(), &fpairs]() {
                     return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
                  });
 
