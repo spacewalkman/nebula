@@ -25,7 +25,7 @@ namespace fs {
 
 std::shared_ptr<HdfsUtils> HdfsUtils::getInstance
     (const char* namenode, tPort port,
-     std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool);
+     std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool) {
     static std::shared_ptr<HdfsUtils> instance(new HdfsUtils(namenode, port, downloadThreadPool));
     return instance;
 }
