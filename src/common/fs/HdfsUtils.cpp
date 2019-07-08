@@ -69,23 +69,22 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
                    });
 
     auto eb = downloadThreadPool_->getEventBase();
-    auto futures = folly::gen::from(filePairs)
+    return folly::gen::from(filePairs)
         | folly::gen::map([&](std::pair<std::string, std::string>& fpairs) {
           return folly::via(eb).then([self = shared_from_this(), &fpairs]() {
                     return self->copyFile(std::get<0>(fpairs), std::get<1>(fpairs));
-                 }).then([](bool status) {
-                     return status ? Status::OK() Status::Error(std::get<0>(fpairs)):
+                 }).then([&](bool status) {
+                     return status ? Status::OK() : Status::Error(std::get<0>(fpairs));
                  }).onError([&](std::exception& e) {
-                     FLOG_ERROR("Copy file from %s to %s failed.",
-                                std::get<0>(fpairs).data(), std::get<1>(fpairs).data());
+                     FLOG_ERROR("Copy file from %s to %s failed, %s",
+                                std::get<0>(fpairs).data(),
+                                std::get<1>(fpairs).data(),
+                                e.what());
                      return Status::Error(std::get<0>(fpairs));
                  });
 
         })
         | folly::gen::as<std::vector>();
-
-    std::vector<folly::Future<Status<std::string>>> ret(std::move(futures));
-    return ret;
 
 //
 //        futures.wait();
