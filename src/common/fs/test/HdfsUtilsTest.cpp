@@ -80,7 +80,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
 
 
         for(auto& f : futures.value()) {
-            std::cout << typeid(f).name() << " , value=" << f.get() << std::endl;
+            std::cout << typeid(f).name() << " , value=" << f.value()<< std::endl;
             //ASSERT_TRUE(f.value());
         }
     }
