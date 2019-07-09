@@ -116,14 +116,10 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
     auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
     const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
-    auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+$");
-
-    std::cout<<"typeid(ret1)" << typeid(ret1).name()<<std::endl;
-    for(auto subDir : *ret1){
-        std::cout<< subDir << std::endl;
-    }
-
-    //ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
+    auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
+    ASSERT_NE(ret1, nullptr);
+    ASSERT_EQ(std::vector<std::string>{"hdfs://localhost:9000/listRecursivelyTest/1",
+                                       "hdfs://localhost:9000/listRecursivelyTest/2"}, *ret1);
 }
 
 }
