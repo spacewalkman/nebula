@@ -116,7 +116,7 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     std::string parentDir{"hdfs://localhost:9000/listRecursivelyTest/"};
     auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
     const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
-    auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
+    auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+$");
 
     std::cout<<"typeid(ret1)" << typeid(ret1).name()<<std::endl;
     for(auto subDir : *ret1){
