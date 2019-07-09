@@ -118,8 +118,9 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
     auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
     ASSERT_NE(ret1, nullptr);
-    ASSERT_EQ(std::vector<std::string>{"hdfs://localhost:9000/listRecursivelyTest/1",
-                                       "hdfs://localhost:9000/listRecursivelyTest/2"}, (*ret1));
+
+    std::vector<std::string> expected { "1", "2" };
+    ASSERT_EQ(expected, *ret1);
 }
 
 }
