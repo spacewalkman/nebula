@@ -43,7 +43,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
     }
 
     if (overwrite) {
-        FileUtils::remove(localDir.c_str(), true);
+        FileUtils::remove(localDir.str(), true);
         FileUtils::makeDir(localDir.toString());
     }
 
@@ -101,7 +101,7 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     hdfsFile
         src = ::hdfsOpenFile(fs_.get(), srcFile.c_str(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
     if (!src) {
-        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.str());
+        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.c_str());
         return false;
     }
 
@@ -111,12 +111,12 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     std::string destParentDir(stripLastFileComponent(dstFile));
 
     if (!FileUtils::makeDir(destParentDir)) {
-        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.str());
+        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.c_str());
     }
 
     FILE* destFp = ::fopen(dstFile.c_str(), "wb");
     if (!destFp) {
-        FLOG_ERROR("Failed to open destination local file: %s", dstFile.str());
+        FLOG_ERROR("Failed to open destination local file: %s", dstFile.c_str());
         return false;
     }
 
@@ -144,7 +144,7 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
 std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPiece hdfsDir,
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
-    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.c_str());
+    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.str());
     int fileCount = -1;
     auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
@@ -171,7 +171,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listFiles(folly::StringPiec
 
     auto trimmed = folly::trimWhitespace(hdfsDir);
     if (!trimmed.empty()) {
-        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.c_str());
+        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.str());
         if (parentDir) {
             auto results = std::make_unique < std::vector < std::string >> ();
             listRecursively(parentDir, patterns, results.get(), 0);
