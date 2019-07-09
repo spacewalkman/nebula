@@ -117,9 +117,12 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     auto downloadThreadPool= std::make_shared<folly::IOThreadPoolExecutor>(2);
     const auto& hdfsUtils = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
     auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
+
+    std::cout<<"typeid(ret1)" << typeid(ret1).name()<<std::endl;
     for(auto subDir : *ret1){
         std::cout<< subDir << std::endl;
     }
+
     ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
 }
 
