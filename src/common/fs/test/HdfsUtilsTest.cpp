@@ -119,8 +119,8 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     auto ret1 = hdfsUtils->listSubDirs(parentDir, "\\d+");
     ASSERT_NE(ret1, nullptr);
 
-    //std::vector<std::string> expected { "1", "2" };
-    ASSERT_EQ(std::vector<std::string> expected { "1", "2" }, *ret1);
+    std::vector<std::string> expected { "1", "2" };
+    ASSERT_EQ(expected, *ret1);
 }
 
 }
