@@ -43,7 +43,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
     }
 
     if (overwrite) {
-        FileUtils::remove(localDir.str(), true);
+        FileUtils::remove(localDir, true);
         FileUtils::makeDir(localDir.toString());
     }
 
@@ -144,7 +144,7 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
 std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPiece hdfsDir,
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
-    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.str());
+    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
     int fileCount = -1;
     auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
