@@ -120,7 +120,7 @@ TEST(HdfsUtilsTest, ListSubDirsTest) {
     for(auto subDir : *ret1){
         std::cout<< subDir << std::endl;
     }
-    //ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
+    ASSERT_EQ(std::vector<std::string>{"1", "2"}, *ret1);
 }
 
 }

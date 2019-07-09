@@ -57,15 +57,15 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
                    files->end(),
                    std::back_inserter(filePairs),
                    [=](const std::string& fileName) -> std::pair<std::string, std::string> {
-                     std::vector<folly::StringPiece> components;
-                     folly::split("/", fileName, components, true);
+                       std::vector<folly::StringPiece> components;
+                       folly::split("/", fileName, components, true);
 
-                     std::string lastDepthComponents;
-                     for (size_t i = components.size() - depth; i < components.size(); i++) {
-                         lastDepthComponents += "/" + components[i].toString();
-                     }
+                       std::string lastDepthComponents;
+                       for (size_t i = components.size() - depth; i < components.size(); i++) {
+                           lastDepthComponents += "/" + components[i].toString();
+                       }
 
-                     return std::make_pair(fileName, localDir.toString() + lastDepthComponents);
+                       return std::make_pair(fileName, localDir.toString() + lastDepthComponents);
                    });
 
     auto eb = downloadThreadPool_->getEventBase();
@@ -101,7 +101,7 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     hdfsFile
         src = ::hdfsOpenFile(fs_.get(), srcFile.c_str(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
     if (!src) {
-        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.c_str());
+        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.str());
         return false;
     }
 
@@ -111,12 +111,12 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     std::string destParentDir(stripLastFileComponent(dstFile));
 
     if (!FileUtils::makeDir(destParentDir)) {
-        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.c_str());
+        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.str());
     }
 
     FILE* destFp = ::fopen(dstFile.c_str(), "wb");
     if (!destFp) {
-        FLOG_ERROR("Failed to open destination local file: %s", dstFile.c_str());
+        FLOG_ERROR("Failed to open destination local file: %s", dstFile.str());
         return false;
     }
 
@@ -148,7 +148,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
     int fileCount = -1;
     auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
-    auto ret = std::make_unique < std::vector < std::string >> ();
+    auto ret = std::make_unique<std::vector<std::string>> ();
     if (fileCount > 0) {
         std::regex regex(pattern);
         for (int i = 0; i < fileCount; i++) {
