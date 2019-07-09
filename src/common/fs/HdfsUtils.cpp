@@ -43,7 +43,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
     }
 
     if (overwrite) {
-        FileUtils::remove(localDir, true);
+        FileUtils::remove(localDir.data(), true);
         FileUtils::makeDir(localDir.toString());
     }
 
@@ -171,7 +171,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listFiles(folly::StringPiec
 
     auto trimmed = folly::trimWhitespace(hdfsDir);
     if (!trimmed.empty()) {
-        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.str());
+        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
         if (parentDir) {
             auto results = std::make_unique < std::vector < std::string >> ();
             listRecursively(parentDir, patterns, results.get(), 0);
