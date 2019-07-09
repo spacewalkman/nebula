@@ -19,16 +19,6 @@ TEST(HdfsUtilsTest, SingletonTest) {
     const auto& hdfsUtils2 = HdfsUtils::getInstance("localhost", 9000, downloadThreadPool);
 
     ASSERT_EQ(std::addressof(*(hdfsUtils1.get())), std::addressof(*(hdfsUtils2.get())));
-
-    auto a1 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
-    auto a2 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
-    auto a3 = std::async(HdfsUtils::getInstance, "localhost", 9000, downloadThreadPool);
-
-    a1.wait();
-    a2.wait();
-    a3.wait();
-    ASSERT_EQ(std::addressof(*(a1.get())), std::addressof(*(a2.get())));
-    ASSERT_EQ(std::addressof(*(a2.get())), std::addressof(*(a3.get())));
 }
 
 TEST(HdfsUtilsTest, ListRecursivelyTest) {
@@ -60,13 +50,13 @@ TEST(HdfsUtilsTest, CopyFileTest) {
     std::string localFile{localDir.path()};
     localFile += "/1";
 
-    if (::access(localFile.data(), F_OK) < 0) {
-        // FLOG_INFO("creating parent dir `%s`", localFile.data());
-        if (::mkdir(localFile.data(), S_IRWXU | S_IRWXG | S_IRWXO ) == -1) {
-            FLOG_ERROR("Failed to create dest local dir: `%s`", localFile.data());
+    if (::access(localFile.c_str(), F_OK) < 0) {
+        // FLOG_INFO("creating parent dir `%s`", localFile.c_str());
+        if (::mkdir(localFile.c_str(), S_IRWXU | S_IRWXG | S_IRWXO ) == -1) {
+            FLOG_ERROR("Failed to create dest local dir: `%s`", localFile.c_str());
         }
 
-        CHECK(::access(localFile.data(), F_OK) == 0);
+        CHECK(::access(localFile.c_str(), F_OK) == 0);
     }
 
     localFile +="/vertex-12345.sst";
@@ -85,7 +75,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         std::string hdfsDir{"hdfs://localhost:9000/listRecursivelyTest/"};
         fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
 
-        auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 2);
+        auto futures = hdfsUtils->copyDir(hdfsDir.c_str(), localDir.path(), 2);
         for (auto& f : futures) {
             f.wait();
             ASSERT_TRUE(f.value().status().ok());
@@ -100,7 +90,7 @@ TEST(HdfsUtilsTest, CopyDirTest) {
         fs::TempDir localDir("/tmp/HdfsUtilsTest-CopyDirTest.XXXXXX");
 
         // FLOG_INFO("localDir= %s", localDir.path());
-        auto futures = hdfsUtils->copyDir(hdfsDir.data(), localDir.path(), 3);
+        auto futures = hdfsUtils->copyDir(hdfsDir.c_str(), localDir.path(), 3);
         for (auto& f : futures) {
             f.wait();
             ASSERT_TRUE(f.value().status().ok());

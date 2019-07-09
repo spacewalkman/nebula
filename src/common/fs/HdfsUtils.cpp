@@ -43,7 +43,7 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
     }
 
     if (overwrite) {
-        FileUtils::remove(localDir.data(), true);
+        FileUtils::remove(localDir.c_str(), true);
         FileUtils::makeDir(localDir.toString());
     }
 
@@ -78,8 +78,8 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
                          status ? Status::OK() : Status::Error(std::get<0>(fpairs)));
                  }).onError([&](std::exception& e) {
                      FLOG_ERROR("Copy file from %s to %s failed, %s",
-                                std::get<0>(fpairs).data(),
-                                std::get<1>(fpairs).data(),
+                                std::get<0>(fpairs).c_str(),
+                                std::get<1>(fpairs).c_str(),
                                 e.what());
                      return StatusOr<std::string>(Status::Error(std::get<0>(fpairs)));
                  });
@@ -99,24 +99,24 @@ std::vector<folly::Future<StatusOr<std::string>>> HdfsUtils::copyDir(folly::Stri
 bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
     CHECK(fs_);
     hdfsFile
-        src = ::hdfsOpenFile(fs_.get(), srcFile.data(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
+        src = ::hdfsOpenFile(fs_.get(), srcFile.c_str(), O_RDONLY, FLAGS_download_bufferSize, 0, 0);
     if (!src) {
-        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.data());
+        FLOG_ERROR("Failed to open source hdfs file: %s", srcFile.c_str());
         return false;
     }
 
-    FVLOG4("copying %s ---> %s", srcFile.data(), dstFile.data());
+    FVLOG4("copying %s ---> %s", srcFile.c_str(), dstFile.c_str());
 
     // make sure dest dir exists
     std::string destParentDir(stripLastFileComponent(dstFile));
 
     if (!FileUtils::makeDir(destParentDir)) {
-        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.data());
+        FLOG_ERROR("Failed to create dest local dir: %s", destParentDir.c_str());
     }
 
-    FILE* destFp = ::fopen(dstFile.data(), "wb");
+    FILE* destFp = ::fopen(dstFile.c_str(), "wb");
     if (!destFp) {
-        FLOG_ERROR("Failed to open destination local file: %s", dstFile.data());
+        FLOG_ERROR("Failed to open destination local file: %s", dstFile.c_str());
         return false;
     }
 
@@ -144,7 +144,7 @@ bool HdfsUtils::copyFile(std::string& srcFile, std::string& dstFile) {
 std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPiece hdfsDir,
                                                                  const std::string& pattern) {
     auto trimmed = folly::trimWhitespace(hdfsDir);
-    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
+    hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.c_str());
     int fileCount = -1;
     auto* subFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
@@ -171,7 +171,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listFiles(folly::StringPiec
 
     auto trimmed = folly::trimWhitespace(hdfsDir);
     if (!trimmed.empty()) {
-        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.data());
+        hdfsFileInfo* parentDir = hdfsGetPathInfo(fs_.get(), trimmed.c_str());
         if (parentDir) {
             auto results = std::make_unique < std::vector < std::string >> ();
             listRecursively(parentDir, patterns, results.get(), 0);
