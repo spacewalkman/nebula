@@ -154,7 +154,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
         for (int i = 0; i < fileCount; i++) {
             FLOG_ERROR("subFiles[%d].mName=%s", i,subFiles[i].mName);
 
-            FLOG_ERROR("std::regex_match(%s, %s)=%d", subFiles[i].mName, pattern, std::regex_match(subFiles[i].mName, regex));
+            FLOG_ERROR("std::regex_match(%s, %s)=%d", subFiles[i].mName, pattern.data(), std::regex_match(subFiles[i].mName, regex));
 
             if (subFiles[i].mKind == kObjectKindDirectory
                 && std::regex_match(subFiles[i].mName, regex)) {
