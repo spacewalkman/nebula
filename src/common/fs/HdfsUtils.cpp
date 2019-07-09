@@ -158,7 +158,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(folly::StringPi
                 auto fileName = folly::StringPiece(subFiles[i].mName);
                 auto dirName = FileUtils::basename(fileName.data());
 
-                FLOG_ERROR("std::regex_match(%s, %s)=%d", dirName, pattern.data(), std::regex_match(dirName, regex));
+                FLOG_ERROR("std::regex_match(%s, %s)=%d", dirName.data(), pattern.data(), std::regex_match(dirName, regex));
 
                 if (std::regex_match(dirName, regex)) {
                     ret->emplace_back(subFiles[i].mName);
