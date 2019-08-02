@@ -4,8 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-#ifndef GRAPH_DOWNLOADEXECUTOR_H_
-#define GRAPH_DOWNLOADEXECUTOR_H_
+#ifndef GRAPH_INGESTEXECUTOR_H_
+#define GRAPH_INGESTEXECUTOR_H_
 
 #include "base/Base.h"
 #include "graph/Executor.h"
@@ -13,12 +13,12 @@
 namespace nebula {
 namespace graph {
 
-class DownloadExecutor final : public Executor {
+class IngestExecutor final : public Executor {
 public:
-    DownloadExecutor(Sentence *sentence, ExecutionContext *ectx);
+    IngestExecutor(Sentence *sentence, ExecutionContext *ectx);
 
     const char* name() const override {
-        return "DownloadExecutor";
+        return "IngestExecutor";
     }
 
     Status MUST_USE_RESULT prepare() override;
@@ -26,12 +26,12 @@ public:
     void execute() override;
 
 private:
-    DownloadExecutor                          *sentence_{nullptr};
+    IngestSentence                          *sentence_{nullptr};
 };
 
 }   // namespace graph
 }   // namespace nebula
 
 
-#endif  // GRAPH_DOWNLOADEXECUTOR_H_
+#endif  // GRAPH_INGESTEXECUTOR_H_
 

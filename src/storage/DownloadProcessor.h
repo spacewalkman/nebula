@@ -4,29 +4,33 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-#ifndef STORAGE_DOWNLOADSSTFILEPROCESSOR_H_
-#define STORAGE_DOWNLOADSSTFILEPROCESSOR_H_
+#ifndef STORAGE_DOWNLOADPROCESSOR_H_
+#define STORAGE_DOWNLOADPROCESSOR_H_
 
 #include "base/Base.h"
-#include "storage/QueryBaseProcessor.h"
+#include "storage/DownloadProcessor.h"
 
 namespace nebula {
 namespace storage {
 
-class DownloadProcessor : public BaseProcessor<cpp2:ImportDataResponse> {
+class DownloadProcessor : public BaseProcessor<cpp2::ExecResponse> {
 public:
-    static DownloadSstFileProcessor* instance(kvstore::KVStore* kvstore, meta::SchemaManager* schemaMan) {
-        return new DownloadSstFileProcessor(kvstore);
+    static DownloadProcessor *instance(kvstore::KVStore *kvstore, meta::SchemaManager *schemaMan) {
+      return new DownloadProcessor(kvstore);
     }
 
-    void process(const cpp2::DownloadSstFilesRequest& req);
+    void process(const cpp2::DownloadReq &req);
 
 private:
-    explicit DownloadSstFileProcessor(kvstore::KVStore* kvstore, meta::SchemaManager* schemaMan)
-    : BaseProcessor<cpp2::ImportDataResponse>(kvstore, schemaMan) {}
+    DownloadProcessor(kvstore::KVStore *kvstore, meta::SchemaManager *schemaMan, folly::Executor *executor)
+        : BaseProcessor<cpp2::ExecResponse>(kvstore, schemaMan) {}
+
+    static cpp2::PartitionID extractPartIdFromFileName(folly::StringPiece fileName);
+
+    folly::Executor* executor_ = nullptr;
 };
 
 }
 }
 
-#endif //STORAGE_DOWNLOADSSTFILEPROCESSOR_H_
+#endif //STORAGE_DOWNLOADPROCESSOR_H_

@@ -4,8 +4,8 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-#ifndef META_DOWNLOADPROCESSOR_H_
-#define META_DOWNLOADPROCESSOR_H_
+#ifndef META_INGESTPROCESSOR_H_
+#define META_INGESTPROCESSOR_H_
 
 #include "meta/processors/BaseProcessor.h"
 
@@ -28,9 +28,21 @@ private:
 
     static std::unique_ptr<common.PartitionID> toPartID(std::vector<std::string>* dirs,
                                                         common.PartitionID* maxPartID);
+
+class IngestProcessor : public BaseProcessor<cpp2::LongRunnigTaskResp> {
+public:
+    static IngestProcessor *instance(kvstore::KVStore *kvstore) {
+        return new IngestProcessor(kvstore);
+    }
+
+    void process(const cpp2::IngestReq &req);
+
+private:
+    explicit IngestProcessor(kvstore::KVStore *kvstore)
+        : BaseProcessor<cpp2::LongRunnigTaskResp>(kvstore) {}
 };
 
 }  // namespace meta
 }  // namespace nebula
 
-#endif //META_DOWNLOADPROCESSOR_H_
+#endif // META_INGESTPROCESSOR_H_

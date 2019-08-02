@@ -5,11 +5,12 @@
  */
 
 #include "fs/HdfsUtils.h"
-#include "meta/processors/importMan/DownloadProcessor.h"
+#include "meta/processors/importMan/IngestProcessor.h"
 
 namespace nebula {
 namespace meta {
 
+<<<<<<< Updated upstream
 void DownloadProcessor::process(const cpp2::DownloadReq& req) {
     // TODO: If we lock the graphspace, it will hold all other space-level modification OP,
     // There is a dilemma here: It is the desired behavior, but it is also a long-running task
@@ -128,6 +129,12 @@ std::unique_ptr<std::set<PartitionID>> DownloadProcessor::toPartID(std::vector<s
     }
 
     return ret;
+=======
+void IngestProcessor::process(const cpp2::IngestReq& req) {
+    // TODO: 通知每个 KVStore关联的所有StorageEngine去ingest localDir下所有的文件
+
+    // onFinished();
+>>>>>>> Stashed changes
 
 }
 
