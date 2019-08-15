@@ -6,7 +6,7 @@
 
     <groupId>nebula-graph</groupId>
     <artifactId>graph-client</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <properties>
         <project.root.dir>../../..</project.root.dir>
@@ -15,12 +15,23 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.root.dir}/src/interface/gen-java/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -70,9 +81,7 @@
         <dependency>
             <groupId>com.facebook</groupId>
             <artifactId>thrift</artifactId>
-            <version>1.0.0-SNAPSHORT</version>
-            <scope>system</scope>
-            <systemPath>${JAVA_FBTHRIFT_JAR}</systemPath>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

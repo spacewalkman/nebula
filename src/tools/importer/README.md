@@ -3,7 +3,7 @@
 
 `Importer` is a tool use to load `CSV` file into `Nebula`.
 
-You can use `./run.sh ${CONFIG_PARAMETER} ${JAVA_FBTHRIFT_JAR}` to startup it.
+You can use `./run.sh ${CONFIG_PARAMETER}` to startup it.
 
 When loading vertex csv file, the first field is vid and then following the value list.
 
