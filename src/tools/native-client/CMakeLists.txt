@@ -16,6 +16,7 @@ target_link_libraries(nebula_native_client
                       ${OPENSSL_SSL_LIBRARY}
                       ${OPENSSL_CRYPTO_LIBRARY}
                       ${THRIFT_LIBRARIES}
+                      fs_obj
                       -lfolly
                       -lboost_context
                       -lglog

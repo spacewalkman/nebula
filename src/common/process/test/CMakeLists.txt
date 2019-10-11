@@ -5,9 +5,9 @@ nebula_add_test(
         ProcessTest.cpp
     OBJECTS
         $<TARGET_OBJECTS:process_obj>
+        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:base_obj>
     LIBRARIES
         gtest
         gtest_main
-        fs_obj
 )

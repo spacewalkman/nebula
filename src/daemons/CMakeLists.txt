@@ -27,13 +27,13 @@ nebula_add_executable(
         $<TARGET_OBJECTS:stats_obj>
         $<TARGET_OBJECTS:thread_obj>
         $<TARGET_OBJECTS:time_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:base_obj>
     LIBRARIES
         proxygenhttpserver
         proxygenlib
         ${THRIFT_LIBRARIES}
         wangle
+        fs_obj
 )
 
 
