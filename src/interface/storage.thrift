@@ -415,9 +415,6 @@ service StorageService {
 
     GetLeaderResp getLeaderPart(1: GetLeaderReq req);
 
-    ImportDataResponse downloadSstFiles(1: DownloadSstFilesRequest req);
-    ImportDataResponse ingestSstFiles(1: IngestSstFilesRequest req);
-
     // Download & Ingest related operations
     ImportFilesResp downloadSstFiles(1: StorageDownloadSstFileReq req);
     ImportFilesResp ingestSstFiles(1: StorageIngestSstFileReq req);
