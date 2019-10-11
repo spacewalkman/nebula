@@ -20,7 +20,6 @@ set(GRAPH_TEST_LIBS
     $<TARGET_OBJECTS:raftex_thrift_obj>
     $<TARGET_OBJECTS:wal_obj>
     $<TARGET_OBJECTS:time_obj>
-    $<TARGET_OBJECTS:fs_obj>
     $<TARGET_OBJECTS:network_obj>
     $<TARGET_OBJECTS:thread_obj>
     $<TARGET_OBJECTS:thrift_obj>
@@ -51,6 +50,7 @@ nebula_add_test(
         wangle
         gtest
         gtest_main
+        fs_obj
 )
 
 nebula_add_test(
@@ -70,6 +70,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -87,6 +88,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -110,6 +112,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -128,6 +131,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -146,6 +150,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -163,6 +168,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -180,6 +186,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -197,6 +204,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -214,6 +222,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -231,5 +240,6 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 

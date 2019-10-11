@@ -7,7 +7,6 @@ nebula_add_test(
         $<TARGET_OBJECTS:http_client_obj>
         $<TARGET_OBJECTS:ws_obj>
         $<TARGET_OBJECTS:process_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:stats_obj>
         $<TARGET_OBJECTS:time_obj>
         $<TARGET_OBJECTS:base_obj>
@@ -17,5 +16,6 @@ nebula_add_test(
         wangle
         gtest
         gtest_main
+        fs_obj
 )
 

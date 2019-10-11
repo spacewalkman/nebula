@@ -12,7 +12,6 @@ nebula_add_test(
         $<TARGET_OBJECTS:common_thrift_obj>
         $<TARGET_OBJECTS:thrift_obj>
         $<TARGET_OBJECTS:network_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:base_obj>
         $<TARGET_OBJECTS:thread_obj>
         $<TARGET_OBJECTS:meta_client>
@@ -23,6 +22,7 @@ nebula_add_test(
         ${THRIFT_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 nebula_add_test(
@@ -39,7 +39,6 @@ nebula_add_test(
         $<TARGET_OBJECTS:common_thrift_obj>
         $<TARGET_OBJECTS:thrift_obj>
         $<TARGET_OBJECTS:network_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:base_obj>
         $<TARGET_OBJECTS:thread_obj>
         $<TARGET_OBJECTS:meta_client>
@@ -51,4 +50,5 @@ nebula_add_test(
         ${THRIFT_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )

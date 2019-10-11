@@ -8,7 +8,6 @@ nebula_add_test(
         $<TARGET_OBJECTS:ws_obj>
         $<TARGET_OBJECTS:base_obj>
         $<TARGET_OBJECTS:process_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:stats_obj>
         $<TARGET_OBJECTS:time_obj>
     LIBRARIES
@@ -16,6 +15,7 @@ nebula_add_test(
         proxygenlib
         wangle
         gtest
+        fs_obj
 )
 
 

@@ -8,7 +8,6 @@ set(KVSTORE_TEST_LIBS
     $<TARGET_OBJECTS:wal_obj>
     $<TARGET_OBJECTS:base_obj>
     $<TARGET_OBJECTS:thread_obj>
-    $<TARGET_OBJECTS:fs_obj>
     $<TARGET_OBJECTS:schema_obj>
     $<TARGET_OBJECTS:network_obj>
     $<TARGET_OBJECTS:thrift_obj>
@@ -20,28 +19,28 @@ nebula_add_test(
     NAME part_test
     SOURCES PartTest.cpp
     OBJECTS ${KVSTORE_TEST_LIBS}
-    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest
+    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest fs_obj
 )
 
 nebula_add_test(
     NAME rocks_engine_test
     SOURCES RocksEngineTest.cpp
     OBJECTS ${KVSTORE_TEST_LIBS}
-    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest
+    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest fs_obj
 )
 
 nebula_add_test(
     NAME nebula_store_test
     SOURCES NebulaStoreTest.cpp
     OBJECTS ${KVSTORE_TEST_LIBS}
-    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest
+    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest fs_obj
 )
 
 nebula_add_test(
     NAME load_test
     SOURCES LoadTest.cpp
     OBJECTS ${KVSTORE_TEST_LIBS}
-    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest
+    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest fs_obj
 )
 
 
@@ -58,7 +57,6 @@ nebula_add_test(
         $<TARGET_OBJECTS:wal_obj>
         $<TARGET_OBJECTS:base_obj>
         $<TARGET_OBJECTS:thread_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:network_obj>
         $<TARGET_OBJECTS:thrift_obj>
         $<TARGET_OBJECTS:time_obj>
@@ -67,6 +65,7 @@ nebula_add_test(
         ${ROCKSDB_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 
@@ -74,12 +73,12 @@ nebula_add_test(
     NAME log_encoder_test
     SOURCES LogEncoderTest.cpp
     OBJECTS ${KVSTORE_TEST_LIBS}
-    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest
+    LIBRARIES ${THRIFT_LIBRARIES} ${ROCKSDB_LIBRARIES} wangle gtest fs_obj
 )
 
 nebula_add_executable(
     NAME multi_versions_perf_test_bm
     SOURCES MultiVersionBenchmark.cpp
-    OBJECTS $<TARGET_OBJECTS:base_obj> $<TARGET_OBJECTS:fs_obj>
-    LIBRARIES follybenchmark ${ROCKSDB_LIBRARIES} boost_regex
+    OBJECTS $<TARGET_OBJECTS:base_obj>
+    LIBRARIES follybenchmark ${ROCKSDB_LIBRARIES} boost_regex fs_obj
 )
