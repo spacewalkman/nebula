@@ -274,8 +274,6 @@ public:
 
     Status refreshCache();
 
-    folly::Future<StatusOr<bool>> remove(std::string segment, std::string key);
-
 protected:
     void loadDataThreadFunc();
     // Return true if load succeeded.
