@@ -29,12 +29,12 @@ nebula_add_test(
 nebula_add_test(
     NAME configuration_test
     SOURCES ConfigurationTest.cpp
-    OBJECTS $<TARGET_OBJECTS:fs_obj> $<TARGET_OBJECTS:base_obj>
-    LIBRARIES gtest gtest_main
+    $<TARGET_OBJECTS:base_obj>
+    LIBRARIES gtest gtest_main fs_obj
 )
 
 nebula_add_test(
-    NAME status_ctest
+    NAME status_test
     SOURCES StatusTest.cpp
     $<TARGET_OBJECTS:base_obj>
     LIBRARIES gtest gtest_main fs_obj
@@ -43,8 +43,8 @@ nebula_add_test(
 nebula_add_test(
     NAME status_or_test
     SOURCES StatusOrTest.cpp
-    OBJECTS $<TARGET_OBJECTS:fs_obj> $<TARGET_OBJECTS:base_obj>
-    LIBRARIES gtest gtest_main
+    $<TARGET_OBJECTS:base_obj>
+    LIBRARIES gtest gtest_main fs_obj
 )
 
 nebula_add_test(
