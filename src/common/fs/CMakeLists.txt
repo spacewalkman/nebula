@@ -11,7 +11,7 @@ if (NOT ENABLE_HDFS_IMPORT_SUPPORT)
 else ()
     nebula_add_library(fs_obj OBJECT ${FILE_SRCS})
 #    set(hdfs_libs ${LIBHDFS_PATH} ${JAVA_JVM_LIBRARY})
-    set_property(TARGET fs_obj PROPERTIES OBJECT_DEPENDS ${LIBHDFS_PATH})
+    set_property(TARGET fs_obj PROPERTY OBJECT_DEPENDS ${LIBHDFS_PATH})
 endif (NOT ENABLE_HDFS_IMPORT_SUPPORT)
 
 add_dependencies(fs_obj base_obj)
