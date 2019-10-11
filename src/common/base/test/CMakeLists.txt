@@ -34,10 +34,10 @@ nebula_add_test(
 )
 
 nebula_add_test(
-    NAME status_test
+    NAME status_ctest
     SOURCES StatusTest.cpp
-    OBJECTS $<TARGET_OBJECTS:fs_obj> $<TARGET_OBJECTS:base_obj>
-    LIBRARIES gtest gtest_main
+    $<TARGET_OBJECTS:base_obj>
+    LIBRARIES gtest gtest_main fs_obj
 )
 
 nebula_add_test(
