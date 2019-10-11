@@ -14,5 +14,3 @@ else ()
 endif (NOT ENABLE_HDFS_IMPORT_SUPPORT)
 
 add_dependencies(fs_obj base_obj)
-
-add_subdirectory(test)
