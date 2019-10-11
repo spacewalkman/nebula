@@ -6,11 +6,11 @@ nebula_add_test(
     OBJECTS
         $<TARGET_OBJECTS:base_obj>
         $<TARGET_OBJECTS:network_obj>
-        $<TARGET_OBJECTS:fs_obj>
     LIBRARIES
         ${THRIFT_LIBRARIES}
         wangle
         gtest
+        fs_obj
 )
 
 
