@@ -73,6 +73,7 @@ if (ENABLE_HDFS_IMPORT_SUPPORT)
     # link hdfs lib
     include_directories($ENV{HADOOP_HOME}/include)
     find_library(LIBHDFS_PATH NAMES hdfs PATHS $ENV{HADOOP_HOME}/lib/native)
+    message(STATUS "LIBHDFS_PATH=" ${LIBHDFS_PATH})
 endif (ENABLE_HDFS_IMPORT_SUPPORT)
 
 if (ENABLE_TESTING)
