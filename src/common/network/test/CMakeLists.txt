@@ -21,10 +21,10 @@ nebula_add_executable(
         NetworkUtilsBenchmark.cpp
     OBJECTS
         $<TARGET_OBJECTS:base_obj>
-        $<TARGET_OBJECTS:fs_obj>
         $<TARGET_OBJECTS:network_obj>
     LIBRARIES
         wangle
         follybenchmark
         boost_regex
+        fs_obj
 )
