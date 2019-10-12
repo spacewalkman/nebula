@@ -150,22 +150,17 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
             auto exceptedSize = storageDownloadFutures.size();
 
-            // No partial failure = SUCCESS
+            // What we do when all partial download finished
             auto updateWholeJobStatusCallback =
                 [exceptedSize, jobId, this](
-                    const std::vector<storage::cpp2::ImportFilesResp> &result) {
-                    ////                    auto jobStatus = result.hasException() ?
-                    ///::nebula::cpp2::JobStatus::ERROR / : ::nebula::cpp2::JobStatus::SUCCESS;
-                    //
-                    ////                    if (jobStatus == ::nebula::cpp2::JobStatus::SUCCESS) {
-                    //                        auto &importResps = result.value();
+                    const std::vector<storage::cpp2::ImportFilesResp> &results) {
                     auto jobStatus = std::all_of(
-                        result.begin(),
-                        imporesulttResps.end(),
+                        results.begin(),
+                        results.end(),
                         [](const storage::cpp2::ImportFilesResp &resp) {
                             return resp.get_code() == ::nebula::storage::cpp2::ErrorCode::SUCCEEDED;
                         });
-                    //                    }
+
                     async_setJobStatus(jobId, jobStatus);
                 };
 
