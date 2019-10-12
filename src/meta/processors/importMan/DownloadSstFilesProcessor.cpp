@@ -84,8 +84,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     std::set<PartitionID> diff;
     std::set_difference(partIdsSetInHdfs->begin(),
                         partIdsSetInHdfs->end(),
-                        partIdSetInMeta->begin(),
-                        partIdSetInMeta->end(),
+                        partIdSetInMeta.begin(),
+                        partIdSetInMeta.end(),
                         std::inserter(diff, diff.begin()));
     if (!diff.empty()) {
         LOG(ERROR) << "Some partition id not seen by meta server:";
