@@ -228,7 +228,6 @@ IP_OCTET                    ([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])
 {META}                      { return TokenType::KW_META; }
 {STORAGE}                   { return TokenType::KW_STORAGE; }
 {OF}                        { return TokenType::KW_OF; }
-{IMPORT}                    { return TokenType::KW_IMPORT; }
 {INTO}                      { return TokenType::KW_INTO; }
 {TRUE}                      { yylval->boolval = true; return TokenType::BOOL; }
 {FALSE}                     { yylval->boolval = false; return TokenType::BOOL; }
