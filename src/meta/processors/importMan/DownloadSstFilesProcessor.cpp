@@ -128,7 +128,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
             resp_.set_code(cpp2::ErrorCode::SUCCEEDED);
 
             // Now all clear, launch download job for each host asynchronously
-            std::vector<folly::SemiFuture<storage::cpp2::ImportFilesResp>> storageDownloadFutures;
+            std::vector<folly::Future<storage::cpp2::ImportFilesResp>> storageDownloadFutures;
             storageDownloadFutures.resize(hostPartsMap.size());
 
             // Fan-out to all storage engine to download simultaneously
