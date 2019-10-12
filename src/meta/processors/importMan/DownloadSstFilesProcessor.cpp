@@ -203,7 +203,7 @@ std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::populateJobStatus(
     auto startTimeValue = reinterpret_cast<char *>(&startTime);
 
     auto hdfsUtils = nebula::fs::HdfsUtils::getInstance(req.get_hdfs_dir());
-    auto &subDirFileCountMap = hdfsUtils->countFilesInSubDir(req.get_hdfs_dir(), "^\\d+$");
+    const auto &subDirFileCountMap = hdfsUtils->countFilesInSubDir(req.get_hdfs_dir(), "^\\d+$");
 
     std::vector<nebula::kvstore::KV> jobStatusMap;
 
