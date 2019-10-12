@@ -199,7 +199,7 @@ std::map<std::string, int> HdfsUtils::countFilesInSubDir(
     int fileCount = 0;
     auto *subDirFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
-    auto ret = std::map<std::string, int>>();
+    auto ret = std::map<std::string, int>();
     if (fileCount > 0) {
         std::regex regex(pattern);
         for (int i = 0; i < fileCount; i++) {

@@ -43,7 +43,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     // Check that all part is allocated to a HostAddr, there should be no hole
     // in between, otherwise, sst files corresponding to the un-allocated
     // partition will not be downloaded
-    std::map<HostAddr, std::set<PartitionID>> hostPartsMap;
+    std::map<nebula::cpp2::HostAddr, std::set<PartitionID>> hostPartsMap;
     std::set<PartitionID> partIdSetInMeta;
     PartitionID maxPartIdInMeta = -1;
     while (iter->valid()) {
@@ -68,8 +68,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
     // TODO: this is based on the convention that PartitionID is a Zero-based,
     //  IF otherwise, need change the test condition here
-    if (static_cast<decltype(partIdSetInMeta)::size_type> maxPartIdInMeta !=
-        (partIdSetInMeta.size() - 1)) {
+    if (decltype(partIdSetInMeta)::size_type maxPartIdInMeta != (partIdSetInMeta.size() - 1)) {
         resp_.set_code(cpp2::ErrorCode::E_HOLE_IN_PART_ALLOCATION);
         onFinished();
         return;
@@ -101,10 +100,10 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
     // Prevent running multiple DOWNLOAD in parallel, which could saturate cpu and network
     std::string val;
-    nebula::cpp2::JobID jobId(req.get_space_id());
+    nebula::cpp2::JobID jobId(folly::to<std::string>(req.get_space_id());
     auto jobIdRet = kvstore_->get(kDefaultSpaceId, kDefaultPartId, jobId + "_" + kJobStatus, &val);
     if (jobIdRet == kvstore::ResultCode::SUCCEEDED) {
-        auto jobStatus = static_cast<nebula::cpp2::JobStatus>(val.data());
+        auto jobStatus = folly::to<nebula::cpp2::JobStatus>(val.data());
         if (jobStatus == nebula::cpp2::JobStatus::INITIALIZING ||
             jobStatus == nebula::cpp2::JobStatus::RUNNING) {
             LOG(ERROR) << "There is another download job in progress";
@@ -139,7 +138,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                 hostPartsMap.begin(),
                 hostPartsMap.end(),
                 std::back_inserter(storageDownloadFutures),
-                [evb, this](const auto &pair) {
+                [evb, jobId, this](const auto &pair) {
                     auto storageClient = storageClientMan_->client(pair.first, evb);
                     // Wrap with jobId, then fanout
                     storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest(
@@ -223,7 +222,8 @@ std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::populateJobStatus(
     jobStatusMap.emplace_back(jobId + "_" + kStartTime, startTimeValue);
     jobStatusMap.emplace_back(jobId + "_" + kLocalDir, req.get_local_dir().data());
     jobStatusMap.emplace_back(jobId + "_" + kTotalCount, sum(subDirFileCountMap));
-    const int zero = 0;
+    // TODO: something bad happens here
+    int zero = 0;
     jobStatusMap.emplace_back(jobId + "_" + kSuccessCount, reinterpret_cast<char *>(&zero));
     jobStatusMap.emplace_back(jobId + "_" + kErrorCount, reinterpret_cast<char *>(&zero));
 
