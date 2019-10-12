@@ -68,7 +68,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
     // TODO: this is based on the convention that PartitionID is a Zero-based,
     //  IF otherwise, need change the test condition here
-    if (decltype(partIdSetInMeta)::size_type maxPartIdInMeta != (partIdSetInMeta.size() - 1)) {
+    if (maxPartIdInMeta != (partIdSetInMeta.size() - 1)) {
         resp_.set_code(cpp2::ErrorCode::E_HOLE_IN_PART_ALLOCATION);
         onFinished();
         return;
@@ -77,7 +77,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     // Check if there is any inconsistence between hdfs source dir structure and
     // There should be no partitionId not know by meta server
     auto hdfsUtils = nebula::fs::HdfsUtils::getInstance(req.get_hdfs_dir());
-    auto subDirsPtr = hdfsUtils->listlistSubDirs(req.get_hdfs_dir(), "^\\d+$");
+    auto subDirsPtr = hdfsUtils->listSubDirs(req.get_hdfs_dir(), "^\\d+$");
     PartitionID maxPartIdInHdfs = -1;
     auto partIdsSetInHdfs = toPartID(subDirsPtr.get(), maxPartIdInHdfs);
 
@@ -100,7 +100,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
     // Prevent running multiple DOWNLOAD in parallel, which could saturate cpu and network
     std::string val;
-    nebula::cpp2::JobID jobId(folly::to<std::string>(req.get_space_id());
+    nebula::cpp2::JobID jobId(folly::to<std::string>(req.get_space_id()));
     auto jobIdRet = kvstore_->get(kDefaultSpaceId, kDefaultPartId, jobId + "_" + kJobStatus, &val);
     if (jobIdRet == kvstore::ResultCode::SUCCEEDED) {
         auto jobStatus = folly::to<nebula::cpp2::JobStatus>(val.data());
@@ -114,8 +114,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     } else if (jobIdRet == kvstore::ResultCode::ERR_KEY_NOT_FOUND) {   // No job start yet
         resp_.set_code(cpp2::ErrorCode::SUCCEEDED);
     } else {
-        LOG(ERROR) << "Unexpected situation happens when downloading sst files,"
-                   << jobIdRet.value().c_str();
+        LOG(ERROR) << "Unexpected situation happens when downloading sst files, error_code="
+                   << jobIdRet.get_code();
         resp_.set_code(cpp2::ErrorCode::E_KVSTORE);
         onFinished();
         return;
@@ -138,7 +138,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                 hostPartsMap.begin(),
                 hostPartsMap.end(),
                 std::back_inserter(storageDownloadFutures),
-                [evb, jobId, this](const auto &pair) {
+                [evb, jobId, req, this](const auto &pair) {
                     auto storageClient = storageClientMan_->client(pair.first, evb);
                     // Wrap with jobId, then fanout
                     storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest(
@@ -162,7 +162,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                               storageDownloadFutures.end(),
                               exceptedSize,
                               [](size_t, storage::cpp2::ImportFilesResp &resp) {
-                                  return resp.get_code() == cpp2::ErrorCode::SUCCEEDED;
+                                  return resp.get_code() ==
+                                         nebula::storage::cpp2::ErrorCode::SUCCEEDED;
                               })
                 .then(std::move(updateWholeJobStatusCallback));
 
@@ -186,7 +187,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 }
 
 void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
-                                                   ::nebula::cpp2::JobStatus &status) {
+                                                   const ::nebula::cpp2::JobStatus &status) {
     kvstore_->asyncPut(kDefaultSpaceId,
                        kDefaultPartId,
                        {kJobStatus, reinterpret_cast<char *>(&status)},

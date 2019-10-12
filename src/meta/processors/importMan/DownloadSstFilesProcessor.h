@@ -49,7 +49,7 @@ private:
     std::unique_ptr<thrift::ThriftClientManager<storage::cpp2::StorageServiceAsyncClient>>
         storageClientMan_;
 
-    void async_setJobStatus(nebula::cpp2::JobID jobId, nebula::cpp2::JobStatus &status);
+    void async_setJobStatus(nebula::cpp2::JobID jobId, const nebula::cpp2::JobStatus &status);
 
     std::vector<nebula::kvstore::KV> populateJobStatus(const nebula::cpp2::DownloadSstFilesReq &req,
                                                        const nebula::cpp2::JobID &jobId);
@@ -57,7 +57,7 @@ private:
     static int sum(const std::map<std::string, int> &subDirFileCountMap);
 };
 
-}  // namespace meta
-}  // namespace nebula
+}   // namespace meta
+}   // namespace nebula
 
-#endif  // META_DOWNLOADSSTFILESPROCESSOR_H_
+#endif   // META_DOWNLOADSSTFILESPROCESSOR_H_
