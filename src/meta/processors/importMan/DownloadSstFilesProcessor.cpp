@@ -50,14 +50,10 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
         auto key = iter->key();
         PartitionID partId;
         memcpy(&partId, key.data() + prefix.size(), sizeof(PartitionID));
-        std::vector<HostAddr> partHosts = MetaServiceUtils::parsePartVal(iter->val());
-        for (auto &partHost : partHosts) {
-            auto it = hostPartsMap.find(partHost);
-            if (it == hostPartsMap.end()) {
-                hostPartsMap.emplace(partHost, std::set<PartitionID>());
-            }
 
-            const auto &partsSet = hostPartsMap[partHost];
+        std::vector<nebula::cpp2::HostAddr> partHosts = MetaServiceUtils::parsePartVal(iter->val());
+        for (auto &partHost : partHosts) {
+            auto &partsSet = hostPartsMap[partHost];
             partsSet.emplace(partId);
         }
 
@@ -87,8 +83,11 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     auto partIdsSetInHdfs = toPartID(subDirsPtr.get(), maxPartIdInHdfs);
 
     std::set<PartitionID> diff;
-    std::set_difference(partIdsSetInHdfs.begin(), partIdsSetInHdfs.end(), partIdSetInMeta.begin(),
-                        partIdSetInMeta.end(), std::inserter(diff, diff.begin()));
+    std::set_difference(partIdsSetInHdfs.begin(),
+                        partIdsSetInHdfs.end(),
+                        partIdSetInMeta.begin(),
+                        partIdSetInMeta.end(),
+                        std::inserter(diff, diff.begin()));
     if (!diff.empty()) {
         LOG(ERROR) << "Some partition id not seen by meta server:";
         for (auto p : diff) {
@@ -113,7 +112,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
             onFinished();
             return;
         }
-    } else if (jobIdRet == kvstore::ResultCode::ERR_KEY_NOT_FOUND) {  // No job start yet
+    } else if (jobIdRet == kvstore::ResultCode::ERR_KEY_NOT_FOUND) {   // No job start yet
         resp_.set_code(cpp2::ErrorCode::SUCCEEDED);
     } else {
         LOG(ERROR) << "Unexpected situation happens when downloading sst files,"
@@ -137,19 +136,21 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
             // TODO: use groupByHost Flow control at Host(IP) level, not HostAddr level,
             // to prevent network saturation
             std::transform(
-                hostPartsMap.begin(), hostPartsMap.end(),
-                std::back_inserter(storageDownloadFutures), [evb, this](const auto &pair) {
+                hostPartsMap.begin(),
+                hostPartsMap.end(),
+                std::back_inserter(storageDownloadFutures),
+                [evb, this](const auto &pair) {
                     auto storageClient = storageClientMan_->client(pair.first, evb);
                     // Wrap with jobId, then fanout
-                    storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest{
+                    storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest = {
                         jobId, std::move(pair.second), req};
                     return storageClient->future_downloadSstFiles(storageDownloadRequest);
                 });
 
             auto exceptedSize = storageDownloadFutures.size();
             auto updateWholeJobStatusCallback =
-                [exceptedSize, jobId,
-                 this](folly::Try<std::vector<storage::cpp2::ImportFilesResp>> &&result) {
+                [exceptedSize, jobId, this](
+                    folly::Try<std::vector<storage::cpp2::ImportFilesResp>> &&result) {
                     if (result.hasException()) {
                         async_setJobStatus(jobId, ::nebula::cpp2::JobStatus::ERROR);
                     } else {
@@ -158,14 +159,15 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                 };
 
             // Fan-in,when all succeed, update job status
-            collectNSucceeded(storageDownloadFutures.begin(), storageDownloadFutures.end(),
+            collectNSucceeded(storageDownloadFutures.begin(),
+                              storageDownloadFutures.end(),
                               exceptedSize,
                               [](size_t, storage::cpp2::ImportFilesResp &resp) {
                                   return resp.get_code() == cpp2::ErrorCode::SUCCEEDED;
                               })
                 .then(std::move(updateWholeJobStatusCallback));
 
-        } else {  // TODO: should be more specific about other error
+        } else {   // TODO: should be more specific about other error
             resp_.set_code(cpp2::ErrorCode::E_KVSTORE);
         }
 
@@ -186,7 +188,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
 void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
                                                    ::nebula::cpp2::JobStatus &status) {
-    kvstore_->asyncPut(kDefaultSpaceId, kDefaultPartId,
+    kvstore_->asyncPut(kDefaultSpaceId,
+                       kDefaultPartId,
                        {kJobStatus, reinterpret_cast<char *>(&status)},
                        [jobId, status](kvstore::ResultCode code) {
                            if (code != kvstore::ResultCode::SUCCEEDED) {
@@ -198,7 +201,8 @@ void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
 }
 
 std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::populateJobStatus(
-    const nebula::cpp2::DownloadSstFilesReq &req, const nebula::cpp2::JobID &jobId) {
+    const nebula::cpp2::DownloadSstFilesReq &req,
+    const nebula::cpp2::JobID &jobId) {
     auto startTime = time::WallClock::fastNowInMilliSec();
     auto startTimeValue = reinterpret_cast<char *>(&startTime);
 
@@ -239,7 +243,8 @@ int DownloadSstFilesProcessor::sum(const std::map<std::string, int> &subDirFileC
 }
 
 std::unique_ptr<std::set<PartitionID>> DownloadSstFilesProcessor::toPartID(
-    std::vector<std::string> *dirs, PartitionID &maxPartID) {
+    std::vector<std::string> *dirs,
+    PartitionID &maxPartID) {
     CHECK(dirs);
     auto ret = std::make_unique<std::set<PartitionID>>();
     std::for_each(dirs->begin(), dirs->end(), [&maxPartID, retPtr = ret.get()](std::string &dir) {
@@ -261,5 +266,5 @@ std::unique_ptr<std::set<PartitionID>> DownloadSstFilesProcessor::toPartID(
     return ret;
 }
 
-}  // namespace meta
-}  // namespace nebula
+}   // namespace meta
+}   // namespace nebula
