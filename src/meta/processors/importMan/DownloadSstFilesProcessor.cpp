@@ -199,9 +199,10 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
 void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
                                                    const ::nebula::cpp2::JobStatus &status) {
+    int v = folly::to<int>(status);
     kvstore_->asyncPut(kDefaultSpaceId,
                        kDefaultPartId,
-                       {kJobStatus, reinterpret_cast<char *>(&status)},
+                       {kJobStatus, reinterpret_cast<char *>(&v)},
                        [jobId, status](kvstore::ResultCode code) {
                            if (code != kvstore::ResultCode::SUCCEEDED) {
                                // TODO: What else can be done if this happens?
