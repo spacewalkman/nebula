@@ -50,7 +50,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
         auto key = iter->key();
         PartitionID partId;
         memcpy(&partId, key.data() + prefix.size(), sizeof(PartitionID));
-        std::vector<cpp2::HostAddr> partHosts = MetaServiceUtils::parsePartVal(iter->val());
+        std::vector<HostAddr> partHosts = MetaServiceUtils::parsePartVal(iter->val());
         for (auto &partHost : partHosts) {
             auto it = hostPartsMap.find(partHost);
             if (it == hostPartsMap.end()) {
