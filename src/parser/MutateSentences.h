@@ -334,7 +334,7 @@ public:
     }
 
     std::string toString() const override;
-    
+
 private:
     bool                                        insertable_{false};
     std::unique_ptr<Expression>                 vid_;
