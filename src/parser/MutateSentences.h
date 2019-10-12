@@ -289,7 +289,6 @@ private:
 
 class UpdateVertexSentence final : public Sentence {
 public:
-<<<<<<< HEAD
     UpdateVertexSentence() {
         kind_ = Kind::kUpdateVertex;
     }
@@ -352,7 +351,6 @@ private:
 
 class UpdateEdgeSentence final : public Sentence {
 public:
-<<<<<<< HEAD
     UpdateEdgeSentence() {
         kind_ = Kind::kUpdateEdge;
     }
