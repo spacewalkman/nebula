@@ -325,22 +325,16 @@ public:
         return whenClause_.get();
     }
 
-    void setInsertable(bool insertable) { insertable_ = insertable; }
-
-    void setVid(Expression *vid) { vid_.reset(vid); }
-
-    void setUpdateList(UpdateList *items) { updateItems_.reset(items); }
-
-    void setWhereClause(WhereClause *clause) { whereClause_.reset(clause); }
-
-    void setYieldClause(YieldClause *clause) { yieldClause_.reset(clause); }
+    void setYieldClause(YieldClause *clause) {
+        yieldClause_.reset(clause);
+    }
 
     const YieldClause* yieldClause() const {
         return yieldClause_.get();
     }
 
     std::string toString() const override;
-
+    
 private:
     bool                                        insertable_{false};
     std::unique_ptr<Expression>                 vid_;
@@ -412,7 +406,9 @@ public:
         return whenClause_.get();
     }
 
-    void setYieldClause(YieldClause *clause) { yieldClause_.reset(clause); }
+    void setYieldClause(YieldClause *clause) {
+        yieldClause_.reset(clause);
+    }
 
     const YieldClause* yieldClause() const {
         return yieldClause_.get();
