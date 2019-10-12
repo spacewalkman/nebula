@@ -153,7 +153,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
             // No partial failure = SUCCESS
             auto updateWholeJobStatusCallback =
                 [exceptedSize, jobId, this](
-                    folly::Try<std::vector<storage::cpp2::ImportFilesResp>> &&result) {
+                    const std::vector<storage::cpp2::ImportFilesResp> &result) {
                     auto jobStatus = result.hasException() ? ::nebula::cpp2::JobStatus::ERROR
                                                            : ::nebula::cpp2::JobStatus::SUCCESS;
 
@@ -177,7 +177,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                                   return resp.get_code() ==
                                          nebula::storage::cpp2::ErrorCode::SUCCEEDED;
                               })
-                .then(std::move(updateWholeJobStatusCallback));
+                .thenValue(std::move(updateWholeJobStatusCallback));
         } else {   // TODO: should be more specific about other error
             resp_.set_code(cpp2::ErrorCode::E_KVSTORE);
         }
