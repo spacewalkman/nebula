@@ -51,8 +51,8 @@ private:
 
     void async_setJobStatus(nebula::cpp2::JobID jobId, const nebula::cpp2::JobStatus &status);
 
-    std::vector<nebula::kvstore::KV> populateJobStatus(const nebula::cpp2::DownloadSstFilesReq &req,
-                                                       const nebula::cpp2::JobID &jobId);
+    std::vector<nebula::kvstore::KV> initJobStatus(const nebula::cpp2::DownloadSstFilesReq &req,
+                                                   const nebula::cpp2::JobID &jobId);
 
     static int sum(const std::map<std::string, int> &subDirFileCountMap);
 };

@@ -122,6 +122,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     }
 
     auto *evb = ioThreadPool_->getEventBase();
+
+    // What we do after job book-keeping succeed.
     auto successCallback = [jobId, evb, req, hostPartsMap, this](kvstore::ResultCode code) {
         if (code == kvstore::ResultCode::SUCCEEDED) {
             resp_.set_job_id(jobId);
@@ -140,7 +142,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                 std::back_inserter(storageDownloadFutures),
                 [evb, jobId, req, this](const auto &pair) {
                     auto storageClient = storageClientMan_->client(pair.first, evb);
-                    // Wrap with jobId, then fanout
+                    // Wrap with jobId and set<PartitionId>, then fanout
                     storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest(
                         jobId, std::move(pair.second), req);
                     return storageClient->future_downloadSstFiles(storageDownloadRequest);
@@ -150,23 +152,20 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
             auto updateWholeJobStatusCallback =
                 [exceptedSize, jobId, this](
                     folly::Try<std::vector<storage::cpp2::ImportFilesResp>> &&result) {
-                    if (result.hasException()) {
-                        async_setJobStatus(jobId, ::nebula::cpp2::JobStatus::ERROR);
-                    } else {
-                        async_setJobStatus(jobId, ::nebula::cpp2::JobStatus::SUCCESS);
-                    }
-                };
+                    auto jobStatus = result.hasException() ? ::nebula::cpp2::JobStatus::ERROR
+                                                           : ::nebula::cpp2::JobStatus::SUCCESS;
+                    async_setJobStatus(jobId, jobStatus);
+                }
 
-            // Fan-in,when all succeed, update job status
-            collectNSucceeded(storageDownloadFutures.begin(),
-                              storageDownloadFutures.end(),
-                              exceptedSize,
-                              [](size_t, storage::cpp2::ImportFilesResp &resp) {
-                                  return resp.get_code() ==
-                                         nebula::storage::cpp2::ErrorCode::SUCCEEDED;
-                              })
-                .then(std::move(updateWholeJobStatusCallback));
-
+                // Fan-in,when all succeed, update job status
+                collectNSucceeded(storageDownloadFutures.begin(),
+                                  storageDownloadFutures.end(),
+                                  exceptedSize,
+                                  [](size_t, storage::cpp2::ImportFilesResp &resp) {
+                                      return resp.get_code() ==
+                                             nebula::storage::cpp2::ErrorCode::SUCCEEDED;
+                                  })
+                    .then(std::move(updateWholeJobStatusCallback));
         } else {   // TODO: should be more specific about other error
             resp_.set_code(cpp2::ErrorCode::E_KVSTORE);
         }
@@ -179,11 +178,11 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
         onFinished();
     };
 
-    // Wait until all jobStatus persist
-    auto jobInsertFuture =
-        kvstore_->asyncMultiPut(kDefaultSpaceId, kDefaultPartId, populateJobStatus(req, jobId))
-            .thenValue(successCallback)
-            .thenError(errorCallback);
+    // Book keeping job status to meta server, and then chain async jobs of downloading jobs for all
+    // storage servers
+    kvstore_->asyncMultiPut(kDefaultSpaceId, kDefaultPartId, initJobStatus(req, jobId))
+        .thenValue(successCallback)
+        .thenError(errorCallback);
 }
 
 void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
@@ -200,7 +199,7 @@ void DownloadSstFilesProcessor::async_setJobStatus(::nebula::cpp2::JobID jobId,
                        });
 }
 
-std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::populateJobStatus(
+std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::initJobStatus(
     const nebula::cpp2::DownloadSstFilesReq &req,
     const nebula::cpp2::JobID &jobId) {
     auto startTime = time::WallClock::fastNowInMilliSec();
