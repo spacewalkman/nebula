@@ -134,11 +134,11 @@ TEST(HdfsUtilsTest, CountFilesInSubDir) {
     auto ret1 =
         hdfsUtils->countFilesInSubDir("hdfs://localhost:9000/listRecursivelyTest/", "^\\d+$");
     std::map<std::string, int> expected{{"1", 1}, {"2", 1}};
-    ASSERT_EQ(expected, *ret1);
+    ASSERT_EQ(expected, ret1);
 }
 
-}  // namespace fs
-}  // namespace nebula
+}   // namespace fs
+}   // namespace nebula
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

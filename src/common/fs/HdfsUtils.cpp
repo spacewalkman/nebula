@@ -191,7 +191,7 @@ std::unique_ptr<std::vector<std::string>> HdfsUtils::listSubDirs(const std::stri
     return rets;
 }
 
-std::unique_ptr<std::map<std::string, int>> HdfsUtils::countFilesInSubDir(
+std::map<std::string, int> HdfsUtils::countFilesInSubDir(
     const std::string &parentHdfsDir, const std::string &pattern) {
     folly::StringPiece hdfsDir(parentHdfsDir.data());
     auto trimmed = folly::trimWhitespace(hdfsDir);
@@ -199,7 +199,7 @@ std::unique_ptr<std::map<std::string, int>> HdfsUtils::countFilesInSubDir(
     int fileCount = 0;
     auto *subDirFiles = ::hdfsListDirectory(fs_.get(), parentDir->mName, &fileCount);
 
-    auto ret = std::make_unique<std::map<std::string, int>>();
+    auto ret = std::map<std::string, int>>();
     if (fileCount > 0) {
         std::regex regex(pattern);
         for (int i = 0; i < fileCount; i++) {
@@ -220,7 +220,7 @@ std::unique_ptr<std::map<std::string, int>> HdfsUtils::countFilesInSubDir(
                         }
                     }
 
-                    ret->operator[](dirName) = subDirFileCount;
+                    ret[dirName] = subDirFileCount;
                 }
             }
         }

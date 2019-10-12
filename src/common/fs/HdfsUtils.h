@@ -51,8 +51,11 @@ public:
      * @return futures that hold all files copy status
      */
     std::vector<folly::Future<StatusOr<std::string>>> copyDir(
-        folly::StringPiece hdfsDir, folly::StringPiece localDir, size_t depth,
-        std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool, bool overwrite = false);
+        folly::StringPiece hdfsDir,
+        folly::StringPiece localDir,
+        size_t depth,
+        std::shared_ptr<folly::IOThreadPoolExecutor> downloadThreadPool,
+        bool overwrite = false);
 
     bool copyFile(std::string &srcFile, std::string &dstFile);
 
@@ -73,12 +76,16 @@ public:
      * @param pattern sub dir name pattern to match
      * @return map, key=sub dir name, value=file count
      */
-    std::unique_ptr<std::map<std::string, int>> countFilesInSubDir(const std::string &parentHdfsDir,
-                                                                   const std::string &pattern);
+    std::map<std::string, int> countFilesInSubDir(const std::string &parentHdfsDir,
+                                                  const std::string &pattern);
 
-    bool operator==(const HdfsUtils &rhs) const { return this->fs_ == rhs.fs_; }
+    bool operator==(const HdfsUtils &rhs) const {
+        return this->fs_ == rhs.fs_;
+    }
 
-    bool operator!=(const HdfsUtils &rhs) const { return !(this->operator==(rhs)); }
+    bool operator!=(const HdfsUtils &rhs) const {
+        return !(this->operator==(rhs));
+    }
 
 private:
     static const std::function<bool(const hdfsFileInfo *fileInfo)> defaultFilter;
@@ -96,7 +103,8 @@ private:
      */
     void listRecursively(const hdfsFileInfo *hdfsFileInfo,
                          const std::vector<folly::StringPiece> &patterns,
-                         std::vector<std::string> *results, size_t depth) const;
+                         std::vector<std::string> *results,
+                         size_t depth) const;
 
     static std::string stripLastFileComponent(const std::string &path) {
         DCHECK(!path.empty() && path != "/");
@@ -125,7 +133,7 @@ private:
     std::function<bool(const hdfsFileInfo *fileInfo)> filter_;
 };
 
-}  // namespace fs
-}  // namespace nebula
+}   // namespace fs
+}   // namespace nebula
 
-#endif  // COMMON_FS_HDFSUTILS_H_
+#endif   // COMMON_FS_HDFSUTILS_H_
