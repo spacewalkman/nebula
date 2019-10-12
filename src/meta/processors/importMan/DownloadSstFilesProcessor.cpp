@@ -68,7 +68,7 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
 
     // TODO: this is based on the convention that PartitionID is a Zero-based,
     //  IF otherwise, need change the test condition here
-    if (maxPartIdInMeta != (partIdSetInMeta.size() - 1)) {
+    if (folly::to<size_t>(maxPartIdInMeta) != (partIdSetInMeta.size() - 1)) {
         resp_.set_code(cpp2::ErrorCode::E_HOLE_IN_PART_ALLOCATION);
         onFinished();
         return;
@@ -82,10 +82,10 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     auto partIdsSetInHdfs = toPartID(subDirsPtr.get(), maxPartIdInHdfs);
 
     std::set<PartitionID> diff;
-    std::set_difference(partIdsSetInHdfs.begin(),
-                        partIdsSetInHdfs.end(),
-                        partIdSetInMeta.begin(),
-                        partIdSetInMeta.end(),
+    std::set_difference(partIdsSetInHdfs->begin(),
+                        partIdsSetInHdfs->end(),
+                        partIdSetInMeta->begin(),
+                        partIdSetInMeta->end(),
                         std::inserter(diff, diff.begin()));
     if (!diff.empty()) {
         LOG(ERROR) << "Some partition id not seen by meta server:";
@@ -114,15 +114,15 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
     } else if (jobIdRet == kvstore::ResultCode::ERR_KEY_NOT_FOUND) {   // No job start yet
         resp_.set_code(cpp2::ErrorCode::SUCCEEDED);
     } else {
-        LOG(ERROR) << "Unexpected situation happens when downloading sst files, error_code="
-                   << jobIdRet.get_code();
+        LOG(ERROR) << "Unexpected exception happens when downloading sst files, error_code="
+                   << folly::to<std::string>(jobIdRet).c_str();
         resp_.set_code(cpp2::ErrorCode::E_KVSTORE);
         onFinished();
         return;
     }
 
     auto *evb = ioThreadPool_->getEventBase();
-    auto successCallback = [jobId, evb, hostPartsMap, this](kvstore::ResultCode code) {
+    auto successCallback = [jobId, evb, req, hostPartsMap, this](kvstore::ResultCode code) {
         if (code == kvstore::ResultCode::SUCCEEDED) {
             resp_.set_job_id(jobId);
             resp_.set_code(cpp2::ErrorCode::SUCCEEDED);
