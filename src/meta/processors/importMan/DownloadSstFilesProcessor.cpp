@@ -142,8 +142,8 @@ void DownloadSstFilesProcessor::process(const ::nebula::cpp2::DownloadSstFilesRe
                 [evb, this](const auto &pair) {
                     auto storageClient = storageClientMan_->client(pair.first, evb);
                     // Wrap with jobId, then fanout
-                    storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest = {
-                        jobId, std::move(pair.second), req};
+                    storage::cpp2::StorageDownloadSstFileReq storageDownloadRequest(
+                        jobId, std::move(pair.second), req);
                     return storageClient->future_downloadSstFiles(storageDownloadRequest);
                 });
 
@@ -223,7 +223,7 @@ std::vector<nebula::kvstore::KV> DownloadSstFilesProcessor::populateJobStatus(
     jobStatusMap.emplace_back(jobId + "_" + kStartTime, startTimeValue);
     jobStatusMap.emplace_back(jobId + "_" + kLocalDir, req.get_local_dir().data());
     jobStatusMap.emplace_back(jobId + "_" + kTotalCount, sum(subDirFileCountMap));
-    int zero = 0;
+    const int zero = 0;
     jobStatusMap.emplace_back(jobId + "_" + kSuccessCount, reinterpret_cast<char *>(&zero));
     jobStatusMap.emplace_back(jobId + "_" + kErrorCount, reinterpret_cast<char *>(&zero));
 
